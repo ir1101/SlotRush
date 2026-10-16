@@ -1,0 +1,7 @@
+# Direct dependencies, pinned so every machine installs the same versions.
+psycopg[binary]==3.3.6    # PostgreSQL driver (version 3), with prebuilt binaries
+psycopg-pool==3.3.3       # connection pool for psycopg (imported as psycopg_pool)
+Faker==40.43.0            # synthetic names, emails and phone numbers
+matplotlib==3.11.2        # charts saved to results/
+pymongo==4.19.0           # MongoDB driver
+pytest==9.1.1             # tests

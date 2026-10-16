@@ -1,0 +1,70 @@
+# SlotRush: PostgreSQL + MongoDB for the BCSE302L project.
+#
+# Start:  python -m slotrush up     (runs "docker compose up -d --wait")
+# Stop:   python -m slotrush down
+#
+# Every ${VARIABLE} below comes from the .env file next to this one.
+# Python reads the same .env, so both sides always agree on ports and passwords.
+
+name: slotrush
+
+services:
+  postgres:
+    # Pinned to major version 17. Version 18 added B-tree "skip scan", which lets a
+    # composite UNIQUE index answer queries on its second column. That would blur the
+    # "no secondary indexes" baseline in the Phase 5 benchmark.
+    image: postgres:17
+    container_name: slotrush-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # Server settings passed on the command line.
+    # fsync and synchronous_commit are deliberately NOT set: they stay at their
+    # defaults (on), which the crash demo depends on.
+    command:
+      - postgres
+      - -c
+      - max_connections=200   # 80 bots + lock monitor + pytest + psql need more than the default 100
+      - -c
+      - log_lock_waits=on     # log any lock wait longer than deadlock_timeout (1s): evidence for the demos
+    # Docker's default /dev/shm is only 64 MB; parallel query workers use it.
+    shm_size: 256mb
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT}:5432"   # reachable from this machine only
+    volumes:
+      - slotrush_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    # Never restart automatically. The crash demo kills this container on purpose
+    # and restarts it itself.
+    restart: "no"
+
+  mongo:
+    image: mongo:8.0
+    container_name: slotrush-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "127.0.0.1:${MONGO_PORT}:27017"
+    volumes:
+      - slotrush_mongodata:/data/db
+    healthcheck:
+      # "ping" is allowed without logging in, so no credentials are needed here.
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    restart: "no"
+
+# Named volumes keep the data when containers are removed.
+# "python -m slotrush down --wipe" deletes them.
+volumes:
+  slotrush_pgdata:
+    name: slotrush_pgdata
+  slotrush_mongodata:
+    name: slotrush_mongodata
