@@ -1,0 +1,32 @@
+faculty_id,expertise,preferred_slot
+1001,Databases,T01
+1001,Databases,T09
+1001,Databases,T11
+1001,Networks,T01
+1001,Networks,T09
+1001,Networks,T11
+1001,Security,T01
+1001,Security,T09
+1001,Security,T11
+1002,Machine Learning,T03
+1002,Machine Learning,T04
+1002,Machine Learning,T12
+1002,Machine Learning,T13
+1002,Statistics,T03
+1002,Statistics,T04
+1002,Statistics,T12
+1002,Statistics,T13
+1002,Vision,T03
+1002,Vision,T04
+1002,Vision,T12
+1002,Vision,T13
+1003,Algorithms,T02
+1003,Algorithms,T05
+1003,Algorithms,T10
+1003,Compilers,T02
+1003,Compilers,T05
+1003,Compilers,T10
+1004,Robotics,T07
+1004,Robotics,T15
+1004,Thermodynamics,T07
+1004,Thermodynamics,T15

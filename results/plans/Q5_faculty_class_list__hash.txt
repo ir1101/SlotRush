@@ -1,0 +1,50 @@
+-- Q5_faculty_class_list (A faculty member's class list (5-way join)), setup: hash
+-- parameters: {'reg_no': '23BEE0595', 'slot_id': 'T05', 'semester': 'FALL2026', 'course_code': 'BCHY104P', 't_from': '2026-07-06 21:00:00+05:30', 't_to': '2026-07-06 21:30:00+05:30', 'min_credits': 16, 'faculty_id': 1631}
+SELECT f.last_name AS faculty, o.offering_id, c.course_code, o.slot_id,
+                   s.reg_no, s.first_name, s.last_name
+            FROM faculty f
+            JOIN offering o     ON o.faculty_id = f.faculty_id
+            JOIN course c       ON c.course_code = o.course_code
+            JOIN registration r ON r.offering_id = o.offering_id
+            JOIN student s      ON s.reg_no = r.reg_no
+            WHERE f.faculty_id = %(faculty_id)s AND o.semester = %(semester)s
+            ORDER BY o.offering_id, s.last_name
+
+Sort  (cost=240.58..241.44 rows=345 width=45) (actual time=13.556..13.664 rows=558 loops=1)
+  Sort Key: o.offering_id, s.last_name
+  Sort Method: quicksort  Memory: 64kB
+  Buffers: shared hit=1730
+  ->  Nested Loop  (cost=5.30..226.04 rows=345 width=45) (actual time=0.150..10.775 rows=558 loops=1)
+        Buffers: shared hit=1730
+        ->  Nested Loop  (cost=5.02..117.67 rows=345 width=33) (actual time=0.123..1.142 rows=558 loops=1)
+              Buffers: shared hit=56
+              ->  Nested Loop  (cost=4.60..49.41 rows=6 width=23) (actual time=0.095..0.249 rows=8 loops=1)
+                    Buffers: shared hit=31
+                    ->  Nested Loop  (cost=4.32..31.65 rows=6 width=23) (actual time=0.073..0.137 rows=8 loops=1)
+                          Buffers: shared hit=13
+                          ->  Index Scan using faculty_pkey on faculty f  (cost=0.28..8.29 rows=1 width=10) (actual time=0.019..0.022 rows=1 loops=1)
+                                Index Cond: (faculty_id = '1631'::smallint)
+                                Buffers: shared hit=3
+                          ->  Bitmap Heap Scan on offering o  (cost=4.05..23.30 rows=6 width=21) (actual time=0.048..0.102 rows=8 loops=1)
+                                Recheck Cond: (faculty_id = '1631'::smallint)
+                                Filter: ((semester)::text = 'FALL2026'::text)
+                                Heap Blocks: exact=8
+                                Buffers: shared hit=10
+                                ->  Bitmap Index Scan on ix_offering_faculty_id  (cost=0.00..4.04 rows=6 width=0) (actual time=0.024..0.024 rows=8 loops=1)
+                                      Index Cond: (faculty_id = '1631'::smallint)
+                                      Buffers: shared hit=2
+                    ->  Index Only Scan using course_course_code_course_type_key on course c  (cost=0.28..2.96 rows=1 width=9) (actual time=0.011..0.011 rows=1 loops=8)
+                          Index Cond: (course_code = (o.course_code)::text)
+                          Heap Fetches: 1
+                          Buffers: shared hit=18
+              ->  Index Only Scan using registration_pkey on registration r  (cost=0.42..10.79 rows=59 width=14) (actual time=0.022..0.073 rows=70 loops=8)
+                    Index Cond: (offering_id = o.offering_id)
+                    Heap Fetches: 0
+                    Buffers: shared hit=25
+        ->  Index Scan using student_pkey on student s  (cost=0.29..0.31 rows=1 width=22) (actual time=0.016..0.016 rows=1 loops=558)
+              Index Cond: ((reg_no)::text = (r.reg_no)::text)
+              Buffers: shared hit=1674
+Planning:
+  Buffers: shared hit=33
+Planning Time: 2.161 ms
+Execution Time: 13.846 ms

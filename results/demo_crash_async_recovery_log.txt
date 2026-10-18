@@ -1,0 +1,22 @@
+Crash demo (synchronous_commit = off)
+  Logged (acknowledged) commits:            360
+  Demo registrations found after restart:   304
+  Logged but missing from the table:        56
+  In the table but not in the log:          0
+
+[FAIL] (a) every logged commit exists in registration
+[PASS] (b) seats_left + registrations = capacity for all 4,520 offerings (0 out of line)
+
+Rows in the table but not in the log are expected. Those transactions committed
+on the server (their WAL record was written), but the server died before the
+acknowledgement reached the bot, so the bot never logged them.
+With synchronous_commit = off, COMMIT returned before the WAL was written, so
+some acknowledged commits were lost when the process died: check (a) FAILS.
+
+Server log after restart:
+2026-10-17 19:31:51.408 UTC [35] LOG:  database system was interrupted; last known up at 2026-10-17 19:28:34 UTC
+2026-10-17 19:31:51.665 UTC [35] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-10-17 19:31:51.669 UTC [35] LOG:  redo starts at 0/23EBD520
+2026-10-17 19:31:51.675 UTC [35] LOG:  redo done at 0/23F5FFA8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-10-17 19:31:51.714 UTC [33] LOG:  checkpoint complete: wrote 72 buffers (0.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.009 s, total=0.031 s; sync files=30, longest=0.002 s, average=0.001 s; distance=650 kB, estimate=650 kB; lsn=0/23F60048, redo lsn=0/23F60048
+2026-10-17 19:31:51.721 UTC [1] LOG:  database system is ready to accept connections

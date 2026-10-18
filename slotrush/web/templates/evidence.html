@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Evidence{% endblock %}
+
+{% block content %}
+<header class="app-head">
+  <h1>Evidence</h1>
+  <p class="lead">Every chart, log and table the commands saved to <code>results/</code>, grouped by syllabus module. Rerun a command and refresh to see the new version.{% if test_line %} Last test run: {{ test_line }}.{% endif %}</p>
+</header>
+
+{% for no, module, files in sections %}
+  <section class="evidence-module">
+    <h2>{{ module }}</h2>
+    {% set images = files|selectattr(2)|list %}
+    {% set texts = files|rejectattr(2)|list %}
+    {% if images %}
+      <div class="gallery">
+        {% for name, caption, _ in images %}
+          <figure>
+            <a href="/results/{{ name }}"><img src="/results/{{ name }}" alt="{{ caption }}" loading="lazy"></a>
+            <figcaption>{{ caption }} ({{ name }})</figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if texts %}
+      <ul class="files">
+        {% for name, caption, _ in texts %}
+          <li><a href="/results/{{ name }}"><strong>{{ name }}</strong><span>{{ caption }}</span></a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if not files %}
+      <div class="empty-state"><p>Nothing saved for this module yet. <code>python -m slotrush review</code> produces it.</p></div>
+    {% endif %}
+  </section>
+{% endfor %}
+{% endblock %}

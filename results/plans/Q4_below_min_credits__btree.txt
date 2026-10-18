@@ -1,0 +1,48 @@
+-- Q4_below_min_credits (Students below the minimum credits), setup: btree
+-- parameters: {'reg_no': '23BEE0595', 'slot_id': 'T05', 'semester': 'FALL2026', 'course_code': 'BCHY104P', 't_from': '2026-07-06 21:00:00+05:30', 't_to': '2026-07-06 21:30:00+05:30', 'min_credits': 16, 'faculty_id': 1631}
+SELECT s.reg_no, s.first_name, s.last_name, COALESCE(SUM(c.credits), 0) AS credits
+            FROM student s
+            LEFT JOIN registration r ON r.reg_no = s.reg_no
+            LEFT JOIN offering o     ON o.offering_id = r.offering_id
+                                    AND o.semester = %(semester)s
+            LEFT JOIN course c       ON c.course_code = o.course_code
+            GROUP BY s.reg_no, s.first_name, s.last_name
+            HAVING COALESCE(SUM(c.credits), 0) < %(min_credits)s
+
+HashAggregate  (cost=8912.09..9301.02 rows=10371 width=30) (actual time=1205.213..1224.597 rows=7693 loops=1)
+  Group Key: s.reg_no
+  Filter: (COALESCE(sum(c.credits), '0'::bigint) < '16'::smallint)
+  Batches: 1  Memory Usage: 4369kB
+  Rows Removed by Filter: 22307
+  Buffers: shared hit=2167
+  ->  Hash Left Join  (cost=1306.07..7619.52 rows=258514 width=24) (actual time=58.077..958.880 rows=258514 loops=1)
+        Hash Cond: ((o.course_code)::text = (c.course_code)::text)
+        Buffers: shared hit=2167
+        ->  Hash Left Join  (cost=1286.57..6916.63 rows=258514 width=31) (actual time=57.350..703.311 rows=258514 loops=1)
+              Hash Cond: (r.offering_id = o.offering_id)
+              Buffers: shared hit=2161
+              ->  Hash Right Join  (cost=1091.07..6041.89 rows=258514 width=26) (actual time=51.045..451.119 rows=258514 loops=1)
+                    Hash Cond: ((r.reg_no)::text = (s.reg_no)::text)
+                    Buffers: shared hit=2078
+                    ->  Seq Scan on registration r  (cost=0.00..4272.14 rows=258514 width=14) (actual time=0.027..85.747 rows=258514 loops=1)
+                          Buffers: shared hit=1687
+                    ->  Hash  (cost=702.14..702.14 rows=31114 width=22) (actual time=50.946..50.950 rows=30000 loops=1)
+                          Buckets: 32768  Batches: 1  Memory Usage: 1882kB
+                          Buffers: shared hit=391
+                          ->  Seq Scan on student s  (cost=0.00..702.14 rows=31114 width=22) (actual time=0.036..18.261 rows=30000 loops=1)
+                                Buffers: shared hit=391
+              ->  Hash  (cost=139.25..139.25 rows=4500 width=13) (actual time=6.271..6.272 rows=4500 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 262kB
+                    Buffers: shared hit=83
+                    ->  Seq Scan on offering o  (cost=0.00..139.25 rows=4500 width=13) (actual time=0.024..3.063 rows=4500 loops=1)
+                          Filter: ((semester)::text = 'FALL2026'::text)
+                          Buffers: shared hit=83
+        ->  Hash  (cost=12.00..12.00 rows=600 width=11) (actual time=0.702..0.703 rows=600 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 34kB
+              Buffers: shared hit=6
+              ->  Seq Scan on course c  (cost=0.00..12.00 rows=600 width=11) (actual time=0.025..0.259 rows=600 loops=1)
+                    Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=60 read=3
+Planning Time: 3.284 ms
+Execution Time: 1226.509 ms

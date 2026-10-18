@@ -1,0 +1,36 @@
+-- Q3_course_time_range (Registrations for a course in a time range), setup: none
+-- parameters: {'reg_no': '23BEE0595', 'slot_id': 'T05', 'semester': 'FALL2026', 'course_code': 'BCHY104P', 't_from': '2026-07-06 21:00:00+05:30', 't_to': '2026-07-06 21:30:00+05:30', 'min_credits': 16, 'faculty_id': 1631}
+SELECT r.reg_no, r.registered_at, o.offering_id, o.slot_id
+            FROM registration r
+            JOIN offering o ON o.offering_id = r.offering_id
+            WHERE o.course_code = %(course_code)s
+              AND r.registered_at BETWEEN %(t_from)s AND %(t_to)s
+            ORDER BY r.registered_at
+
+Gather Merge  (cost=5112.83..5115.48 rows=23 width=26) (actual time=45.308..53.493 rows=40 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  Buffers: shared hit=1938
+  ->  Sort  (cost=4112.82..4112.88 rows=23 width=26) (actual time=37.570..37.578 rows=20 loops=2)
+        Sort Key: r.registered_at
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=1938
+        Worker 0:  Sort Method: quicksort  Memory: 25kB
+        ->  Hash Join  (cost=140.04..4112.30 rows=23 width=26) (actual time=32.203..37.399 rows=20 loops=2)
+              Hash Cond: (r.offering_id = o.offering_id)
+              Buffers: shared hit=1901
+              ->  Parallel Seq Scan on registration r  (cost=0.00..3968.01 rows=1623 width=22) (actual time=30.316..35.110 rows=1365 loops=2)
+                    Filter: ((registered_at >= '2026-07-06 15:30:00+00'::timestamp with time zone) AND (registered_at <= '2026-07-06 16:00:00+00'::timestamp with time zone))
+                    Rows Removed by Filter: 127892
+                    Buffers: shared hit=1687
+              ->  Hash  (cost=139.25..139.25 rows=63 width=8) (actual time=1.648..1.650 rows=63 loops=2)
+                    Buckets: 1024  Batches: 1  Memory Usage: 11kB
+                    Buffers: shared hit=166
+                    ->  Seq Scan on offering o  (cost=0.00..139.25 rows=63 width=8) (actual time=1.221..1.590 rows=63 loops=2)
+                          Filter: ((course_code)::text = 'BCHY104P'::text)
+                          Rows Removed by Filter: 4437
+                          Buffers: shared hit=166
+Planning:
+  Buffers: shared hit=26
+Planning Time: 0.659 ms
+Execution Time: 53.566 ms

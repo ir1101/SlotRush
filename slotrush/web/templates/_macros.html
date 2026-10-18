@@ -1,0 +1,65 @@
+{# NULL venue is shown as "not allotted": the NULL-handling point from the brief. #}
+{% macro venue(v) %}{% if v %}{{ v }}{% else %}<span class="muted">not allotted</span>{% endif %}{% endmacro %}
+
+{# A small filled bar showing how many seats are taken. #}
+{% macro seat_bar(taken, capacity) %}
+  {% set pct = (100 * taken / capacity) if capacity else 0 %}
+  <span class="bar {{ 'full' if taken >= capacity }}" aria-hidden="true"><i style="width: {{ '%.0f'|format(pct) }}%"></i></span>
+{% endmacro %}
+
+{# The footer: four columns, then the wordmark across the full width. #}
+{% macro footer(credits, me, full=False) %}
+<footer class="site-footer {{ 'full' if full }}">
+  <div class="columns">
+    <div>
+      <h2>Pages</h2>
+      <ul>
+        <li><a class="link" href="/student">Student</a></li>
+        <li><a class="link" href="/student/catalogue">Catalogue</a></li>
+        <li><a class="link" href="/faculty">Faculty</a></li>
+        <li><a class="link" href="/admin">Seats</a></li>
+        <li><a class="link" href="/evidence">Evidence</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Run it</h2>
+      <ul>
+        <li><code>python -m slotrush up</code></li>
+        <li><code>python -m slotrush load</code></li>
+        <li><code>python -m slotrush web</code></li>
+        <li><code>python -m slotrush review</code></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Project</h2>
+      <ul>
+        <li>BCSE302L Database Systems</li>
+        <li>PostgreSQL 17 and MongoDB 8</li>
+        <li>Raw SQL, no ORM</li>
+        {% if me %}
+          <li>
+            <form method="post" action="/logout">
+              Signed in as {{ me.name }}.
+              <button class="button small inverse" type="submit">Log out</button>
+            </form>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    <div>
+      <h2>Pictures</h2>
+      <ul class="credits">
+        {% for c in credits %}
+          <li><a class="link" href="{{ c.page }}">{{ c.title }}</a>{% if c.creator %} by {{ c.creator }}{% endif %}, {{ c.license }}, via {{ c.via }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {# The wordmark is SVG text stretched to the exact width, so it never wraps. #}
+  <svg class="mark" viewBox="0 0 1000 152" role="img" aria-label="SlotRush">
+    <text x="0" y="136" textLength="1000" lengthAdjust="spacingAndGlyphs"
+          font-family="Libre Franklin, Arial, sans-serif" font-weight="700" font-size="184">SLOTRUSH</text>
+  </svg>
+  <p class="legal">A student project for BCSE302L. The found photographs belong to their makers and are used under the licences listed above.</p>
+</footer>
+{% endmacro %}

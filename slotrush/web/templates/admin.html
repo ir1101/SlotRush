@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import venue, seat_bar %}
+{% block title %}Seat fill{% endblock %}
+
+{% block content %}
+<header class="app-head">
+  <h1>Seat fill</h1>
+  <p class="lead">Every {{ semester }} offering from <code>v_admin_seat_fill</code>, fullest first. The view computes <code>seats_taken</code> and <code>fill_pct</code>; nothing here is stored twice.</p>
+</header>
+
+<div class="figures">
+  {% for s in summary %}
+    <div>
+      <p class="value">{{ '%.0f'|format(100 * s.taken / s.seats) }}%</p>
+      <p>of {{ s.slot_kind|lower }} seats taken, {{ '{:,}'.format(s.taken) }} of {{ '{:,}'.format(s.seats) }}</p>
+    </div>
+    <div>
+      <p class="value">{{ '{:,}'.format(s.full_offerings) }}</p>
+      <p>of {{ '{:,}'.format(s.offerings) }} {{ s.slot_kind|lower }} offerings full, {{ s.waitlisted }} waitlisted</p>
+    </div>
+  {% endfor %}
+</div>
+
+<h2>Offerings</h2>
+<form class="filters" method="get" action="/admin" role="search">
+  <div class="field">
+    <label for="q">Course code or title</label>
+    <input id="q" name="q" type="search" value="{{ q }}" placeholder="BMAT" autocomplete="off">
+  </div>
+  <div class="field narrow">
+    <label for="slot">Slot</label>
+    <select id="slot" name="slot">
+      <option value="">Any</option>
+      {% for s in slots %}<option value="{{ s }}" {{ 'selected' if s == slot }}>{{ s }}</option>{% endfor %}
+    </select>
+  </div>
+  <label class="check"><input type="checkbox" name="full" value="1" {{ 'checked' if full_only }}> Full only</label>
+  <button class="button quiet" type="submit">Filter</button>
+</form>
+
+{% if rows %}
+  <p class="muted">{{ rows|length }} offerings{{ ', the first 100' if rows|length == 100 }}.</p>
+  <table class="table">
+    <thead><tr><th class="r">Offering</th><th>Course</th><th>Title</th><th>Slot</th><th>Venue</th><th>Fill</th><th class="r">Taken</th><th class="r">Capacity</th><th class="r">Waitlist</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+        <tr>
+          <td data-label="Offering" class="r num muted">{{ r.offering_id }}</td>
+          <td data-label="Course" class="code">{{ r.course_code }}</td>
+          <td data-label="Title" class="title-cell">{{ r.title }}</td>
+          <td data-label="Slot">{{ r.slot_id }}</td>
+          <td data-label="Venue">{{ venue(r.venue) }}</td>
+          <td data-label="Fill" class="num">{{ seat_bar(r.seats_taken, r.capacity) }}{{ r.fill_pct }}%</td>
+          <td data-label="Taken" class="r num">{{ r.seats_taken }}</td>
+          <td data-label="Capacity" class="r num">{{ r.capacity }}</td>
+          <td data-label="Waitlist" class="r num">{{ r.waitlisted }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="empty-state"><p>No offerings match these filters.</p><a class="button quiet" href="/admin">Clear the filters</a></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+-- Q2_seats_in_slot (Seats left in one slot), setup: none
+-- parameters: {'reg_no': '23BEE0595', 'slot_id': 'T05', 'semester': 'FALL2026', 'course_code': 'BCHY104P', 't_from': '2026-07-06 21:00:00+05:30', 't_to': '2026-07-06 21:30:00+05:30', 'min_credits': 16, 'faculty_id': 1631}
+SELECT o.offering_id, o.course_code, o.faculty_id, o.capacity, o.seats_left
+            FROM offering o
+            WHERE o.slot_id = %(slot_id)s AND o.semester = %(semester)s AND o.seats_left > 0
+            ORDER BY o.seats_left DESC
+
+Sort  (cost=165.23..165.49 rows=104 width=21) (actual time=2.311..2.335 rows=115 loops=1)
+  Sort Key: seats_left DESC
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=83
+  ->  Seq Scan on offering o  (cost=0.00..161.75 rows=104 width=21) (actual time=0.057..2.186 rows=115 loops=1)
+        Filter: ((seats_left > 0) AND ((slot_id)::text = 'T05'::text) AND ((semester)::text = 'FALL2026'::text))
+        Rows Removed by Filter: 4385
+        Buffers: shared hit=83
+Planning:
+  Buffers: shared hit=21
+Planning Time: 0.397 ms
+Execution Time: 2.387 ms

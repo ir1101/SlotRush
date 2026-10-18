@@ -1,0 +1,4 @@
+Query: db.reviews.find({"faculty.id": 1560, "rating": {"$gte": 4}})
+Before index: {'plan': 'COLLSCAN', 'returned': 25, 'docs_examined': 5000, 'keys_examined': 0, 'time_ms': 11}
+Index created: faculty.id_1_rating_-1  (compound: faculty.id ascending, rating descending)
+After index:  {'plan': 'FETCH -> IXSCAN(faculty.id_1_rating_-1)', 'returned': 25, 'docs_examined': 25, 'keys_examined': 25, 'time_ms': 3}

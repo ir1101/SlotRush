@@ -1,0 +1,11 @@
+{
+  "run": "serializable",
+  "capacity": 30,
+  "bots": 80,
+  "admitted": 30,
+  "seats_left": 0,
+  "seconds": 4.219,
+  "retries": 1288,
+  "max_retries_one_bot": 22,
+  "gave_up": 0
+}

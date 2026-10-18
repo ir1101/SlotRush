@@ -1,0 +1,10 @@
+{
+  "run": "crash-async",
+  "logged": 360,
+  "found": 304,
+  "missing": 56,
+  "unlogged": 0,
+  "check_a": false,
+  "check_b": true,
+  "seconds": 0.619
+}

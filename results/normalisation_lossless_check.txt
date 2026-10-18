@@ -1,0 +1,71 @@
+Exported 4247 rows to results/flat_registration_export.csv
+
+Flat export: 4247 rows (500 students). Unnested to 1NF (one phone per row): 5776 rows.
+
+Functional dependencies, checked against the data:
+  reg_no -> first_name, last_name, programme: holds
+  course_code -> title, credits, course_type: holds
+  faculty_id -> faculty_name, school: holds
+  offering_id -> semester, course_code, faculty_id, slot_id, venue, capacity: holds
+  reg_no, offering_id -> registered_at: holds
+  reg_no, offering_id -> phone: does NOT hold (a student with 2 phones has 2 rows per class: phone is multivalued)
+
+Attribute closures (using the FDs above):
+  {reg_no}+ = 4 of 18 attributes  (missing: capacity, course_code, course_type, credits, faculty_id, faculty_name, offering_id, phone, registered_at, school, semester, slot_id, title, venue)
+  {offering_id}+ = 12 of 18 attributes  (missing: first_name, last_name, phone, programme, reg_no, registered_at)
+  {reg_no, offering_id}+ = 17 of 18 attributes  (missing: phone)
+  {reg_no, offering_id, phone}+ = 18 of 18 attributes  -> superkey
+  Candidate key of the 1NF relation: {reg_no, offering_id, phone} (no attribute can be dropped and stay a superkey).
+
+Decomposition steps (each must be lossless):
+  [LOSSLESS] 1NF: move the multivalued phone into StudentPhone
+      parts: 4247-row (reg_no, first_name, last_name, programme, offering_id, semester, course_code, title, credits, course_type, faculty_id, faculty_name, school, slot_id, venue, capacity, registered_at) ⋈ 687-row (reg_no, phone)
+      original 5776 rows, joined back 5776 rows, spurious 0
+  [LOSSLESS] 2NF: remove partial dependencies on {reg_no, offering_id}
+      parts: 4247-row (reg_no, offering_id, registered_at) ⋈ 500-row (reg_no, first_name, last_name, programme) ⋈ 2494-row (offering_id, semester, course_code, title, credits, course_type, faculty_id, faculty_name, school, slot_id, venue, capacity)
+      original 4247 rows, joined back 4247 rows, spurious 0
+  [LOSSLESS] 3NF/BCNF: remove transitive dependencies through course_code and faculty_id
+      parts: 2494-row (offering_id, semester, course_code, faculty_id, slot_id, venue, capacity) ⋈ 330-row (course_code, title, credits, course_type) ⋈ 646-row (faculty_id, faculty_name, school)
+      original 2494 rows, joined back 2494 rows, spurious 0
+  [LOSSLESS] All six BCNF relations joined back = the 1NF relation
+      parts: 4247-row (reg_no, offering_id, registered_at) ⋈ 500-row (reg_no, first_name, last_name, programme) ⋈ 687-row (reg_no, phone) ⋈ 2494-row (offering_id, semester, course_code, faculty_id, slot_id, venue, capacity) ⋈ 330-row (course_code, title, credits, course_type) ⋈ 646-row (faculty_id, faculty_name, school)
+      original 5776 rows, joined back 5776 rows, spurious 0
+
+Dependency preservation: every FD fits inside one final relation:
+  reg_no -> first_name, last_name, programme: in Student
+  course_code -> title, credits, course_type: in Course
+  faculty_id -> faculty_name, school: in Faculty
+  offering_id -> semester, course_code, faculty_id, slot_id, venue, capacity: in Offering
+  reg_no, offering_id -> registered_at: in Registration
+
+For contrast, a LOSSY split (the shared attribute slot_id is a key of neither part):
+  [LOSSY] (reg_no, slot_id) and (slot_id, offering_id, course_code)
+      parts: 4247-row (reg_no, slot_id) ⋈ 2494-row (slot_id, offering_id, course_code)
+      original 4247 rows, joined back 312677 rows, spurious 308430
+
+4NF example: FacultyPreference(faculty_id, expertise, preferred_slot)
+  31 rows. Its only candidate key is all three attributes, so it is in BCNF (no non-trivial FD at all).
+  MVDs: faculty_id ->> expertise and faculty_id ->> preferred_slot (each faculty member's rows are the full product of the two lists).
+  Anomaly: giving faculty 1002 one more expertise needs 4 new rows, one per preferred slot.
+  [LOSSLESS] 4NF split on the MVD
+      parts: 10-row (faculty_id, expertise) ⋈ 12-row (faculty_id, preferred_slot)
+      original 31 rows, joined back 31 rows, spurious 0
+  Rows stored: 31 before, 22 after.
+
+5NF example: Eligibility(faculty, course, slot), 7 rows, all-key, no MVDs:
+  [LOSSY] two projections: (faculty, course) + (course, slot)
+      parts: 5-row (faculty, course) ⋈ 5-row (course, slot)
+      original 7 rows, joined back 9 rows, spurious 2
+  [LOSSY] two projections: (faculty, course) + (faculty, slot)
+      parts: 5-row (faculty, course) ⋈ 5-row (faculty, slot)
+      original 7 rows, joined back 9 rows, spurious 2
+  [LOSSY] two projections: (course, slot) + (faculty, slot)
+      parts: 5-row (course, slot) ⋈ 5-row (faculty, slot)
+      original 7 rows, joined back 9 rows, spurious 2
+  Every two-way split is lossy, so no MVD holds and the table is in 4NF.
+  [LOSSLESS] three projections: join dependency *(FC, CS, FS)
+      parts: 5-row (faculty, course) ⋈ 5-row (course, slot) ⋈ 5-row (faculty, slot)
+      original 7 rows, joined back 7 rows, spurious 0
+  The three-way split is lossless: the join dependency holds, so the table is not in 5NF until it is split into all three.
+
+Result: every expected check PASSED

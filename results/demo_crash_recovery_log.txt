@@ -1,0 +1,20 @@
+Crash demo (default settings)
+  Logged (acknowledged) commits:            352
+  Demo registrations found after restart:   353
+  Logged but missing from the table:        0
+  In the table but not in the log:          1
+
+[PASS] (a) every logged commit exists in registration
+[PASS] (b) seats_left + registrations = capacity for all 4,520 offerings (0 out of line)
+
+Rows in the table but not in the log are expected. Those transactions committed
+on the server (their WAL record was written), but the server died before the
+acknowledgement reached the bot, so the bot never logged them.
+
+Server log after restart:
+2026-10-17 19:31:56.199 UTC [29] LOG:  database system was interrupted; last known up at 2026-10-17 19:31:51 UTC
+2026-10-17 19:31:56.476 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-10-17 19:31:56.479 UTC [29] LOG:  redo starts at 0/23F600C0
+2026-10-17 19:31:56.483 UTC [29] LOG:  redo done at 0/240451D8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-10-17 19:31:56.538 UTC [27] LOG:  checkpoint complete: wrote 102 buffers (0.6%); 0 WAL file(s) added, 1 removed, 0 recycled; write=0.005 s, sync=0.025 s, total=0.050 s; sync files=29, longest=0.017 s, average=0.001 s; distance=916 kB, estimate=916 kB; lsn=0/24045200, redo lsn=0/24045200
+2026-10-17 19:31:56.543 UTC [1] LOG:  database system is ready to accept connections

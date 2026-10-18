@@ -1,0 +1,164 @@
+{
+  "average_rating_per_faculty": [
+    {
+      "_id": 1634,
+      "name": "Amrita Sha",
+      "avg_rating": 5.0,
+      "reviews": 7
+    },
+    {
+      "_id": 1731,
+      "name": "Henry Mody",
+      "avg_rating": 5.0,
+      "reviews": 7
+    },
+    {
+      "_id": 1234,
+      "name": "Lakshmi Kala",
+      "avg_rating": 5.0,
+      "reviews": 5
+    },
+    {
+      "_id": 1660,
+      "name": "Charles Baral",
+      "avg_rating": 4.8,
+      "reviews": 5
+    },
+    {
+      "_id": 1607,
+      "name": "Ekanta Dutta",
+      "avg_rating": 4.75,
+      "reviews": 16
+    },
+    {
+      "_id": 1544,
+      "name": "Janya Borra",
+      "avg_rating": 4.7272727272727275,
+      "reviews": 11
+    },
+    {
+      "_id": 1526,
+      "name": "Sachi Shukla",
+      "avg_rating": 4.7,
+      "reviews": 10
+    },
+    {
+      "_id": 1026,
+      "name": "Varenya Varghese",
+      "avg_rating": 4.666666666666667,
+      "reviews": 6
+    },
+    {
+      "_id": 1281,
+      "name": "Vrishti Deol",
+      "avg_rating": 4.666666666666667,
+      "reviews": 6
+    },
+    {
+      "_id": 1396,
+      "name": "Teerth Borra",
+      "avg_rating": 4.666666666666667,
+      "reviews": 6
+    }
+  ],
+  "most_common_tags": [
+    {
+      "_id": "engaging",
+      "count": 787
+    },
+    {
+      "_id": "clear lectures",
+      "count": 776
+    },
+    {
+      "_id": "good notes",
+      "count": 775
+    },
+    {
+      "_id": "lenient grading",
+      "count": 731
+    },
+    {
+      "_id": "well equipped",
+      "count": 702
+    },
+    {
+      "_id": "helpful TA",
+      "count": 701
+    },
+    {
+      "_id": "fair viva",
+      "count": 690
+    },
+    {
+      "_id": "heavy workload",
+      "count": 515
+    },
+    {
+      "_id": "tough exams",
+      "count": 489
+    },
+    {
+      "_id": "boring",
+      "count": 486
+    }
+  ],
+  "rating_by_course_type": [
+    {
+      "_id": "LAB",
+      "avg_rating": 3.4415,
+      "reviews": 2000,
+      "avg_lecture_clarity": null,
+      "avg_lab_equipment": 3.388,
+      "avg_guide_availability": null
+    },
+    {
+      "_id": "PROJECT",
+      "avg_rating": 3.47,
+      "reviews": 200,
+      "avg_lecture_clarity": null,
+      "avg_lab_equipment": null,
+      "avg_guide_availability": 3.49
+    },
+    {
+      "_id": "THEORY",
+      "avg_rating": 3.4364285714285714,
+      "reviews": 2800,
+      "avg_lecture_clarity": 3.41,
+      "avg_lab_equipment": null,
+      "avg_guide_availability": null
+    }
+  ],
+  "labs_with_worst_equipment": [
+    {
+      "_id": "BITE102P",
+      "title": "Foundations of Information Security Lab",
+      "avg_equipment": 2.0,
+      "reviews": 4
+    },
+    {
+      "_id": "BEEE306P",
+      "title": "Advanced Power Systems Lab",
+      "avg_equipment": 2.25,
+      "reviews": 4
+    },
+    {
+      "_id": "BCSE206P",
+      "title": "Algorithms Lab",
+      "avg_equipment": 2.3333333333333335,
+      "reviews": 3
+    },
+    {
+      "_id": "BITE301P",
+      "title": "Applied Information Security III Lab",
+      "avg_equipment": 2.4285714285714284,
+      "reviews": 7
+    },
+    {
+      "_id": "BCHY202P",
+      "title": "Polymer Science Lab",
+      "avg_equipment": 2.6666666666666665,
+      "reviews": 3
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+SlotRush connection check, 2026-10-17 22:27:46
+
+PostgreSQL  127.0.0.1:5432/slotrush  OK
+  PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+  server_version                 17.11 (Debian 17.11-1.pgdg13+2)
+  fsync                          on
+  synchronous_commit             on
+  full_page_writes               on
+  wal_level                      replica
+  max_connections                200
+  default_transaction_isolation  read committed
+  deadlock_timeout               1s
+  log_lock_waits                 on
+
+MongoDB     127.0.0.1:27017  OK
+  version                        8.0.34
+
+Result: both databases are reachable.

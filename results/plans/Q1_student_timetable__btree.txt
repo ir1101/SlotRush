@@ -1,0 +1,41 @@
+-- Q1_student_timetable (One student's timetable), setup: btree
+-- parameters: {'reg_no': '23BEE0595', 'slot_id': 'T05', 'semester': 'FALL2026', 'course_code': 'BCHY104P', 't_from': '2026-07-06 21:00:00+05:30', 't_to': '2026-07-06 21:30:00+05:30', 'min_credits': 16, 'faculty_id': 1631}
+SELECT t.day, t.period, o.slot_id, c.course_code, c.title, o.venue
+            FROM registration r
+            JOIN offering o    ON o.offering_id = r.offering_id
+            JOIN course c      ON c.course_code = o.course_code
+            JOIN slot_timing t ON t.slot_id = o.slot_id
+            WHERE r.reg_no = %(reg_no)s
+            ORDER BY t.day, t.period
+
+Sort  (cost=114.31..114.36 rows=21 width=49) (actual time=0.771..0.783 rows=40 loops=1)
+  Sort Key: t.day, t.period
+  Sort Method: quicksort  Memory: 27kB
+  Buffers: shared hit=142 read=3
+  ->  Nested Loop  (cost=5.19..113.85 rows=21 width=49) (actual time=0.217..0.712 rows=40 loops=1)
+        Buffers: shared hit=142 read=3
+        ->  Nested Loop  (cost=5.05..112.05 rows=9 width=45) (actual time=0.198..0.550 rows=20 loops=1)
+              Buffers: shared hit=121 read=3
+              ->  Nested Loop  (cost=4.77..109.33 rows=9 width=19) (actual time=0.175..0.324 rows=20 loops=1)
+                    Buffers: shared hit=61 read=3
+                    ->  Bitmap Heap Scan on registration r  (cost=4.49..38.63 rows=9 width=4) (actual time=0.140..0.150 rows=20 loops=1)
+                          Recheck Cond: ((reg_no)::text = '23BEE0595'::text)
+                          Heap Blocks: exact=1
+                          Buffers: shared hit=1 read=3
+                          ->  Bitmap Index Scan on ix_registration_reg_no  (cost=0.00..4.49 rows=9 width=0) (actual time=0.058..0.059 rows=20 loops=1)
+                                Index Cond: ((reg_no)::text = '23BEE0595'::text)
+                                Buffers: shared read=3
+                    ->  Index Scan using offering_pkey on offering o  (cost=0.28..7.86 rows=1 width=23) (actual time=0.007..0.007 rows=1 loops=20)
+                          Index Cond: (offering_id = r.offering_id)
+                          Buffers: shared hit=60
+              ->  Index Scan using course_course_code_course_type_key on course c  (cost=0.28..0.30 rows=1 width=35) (actual time=0.010..0.010 rows=1 loops=20)
+                    Index Cond: ((course_code)::text = (o.course_code)::text)
+                    Buffers: shared hit=60
+        ->  Index Only Scan using slot_timing_pkey on slot_timing t  (cost=0.14..0.18 rows=2 width=8) (actual time=0.005..0.006 rows=2 loops=20)
+              Index Cond: (slot_id = (o.slot_id)::text)
+              Heap Fetches: 0
+              Buffers: shared hit=21
+Planning:
+  Buffers: shared hit=60 read=8
+Planning Time: 3.079 ms
+Execution Time: 0.875 ms

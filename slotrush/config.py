@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = ROOT / ".env"
 ENV_EXAMPLE = ROOT / ".env.example"
 RESULTS_DIR = ROOT / "results"   # every chart, CSV, plan and log goes here
+SQL_DIR = ROOT / "sql"
+
+SEED = 2026                      # the one random seed used everywhere
+SEMESTER = "FALL2026"            # the semester all generated data belongs to
+DEMO_SEMESTER = "DEMO"           # demo offerings live here, apart from the real data
+TEST_DB_SUFFIX = "_test"         # tests use <POSTGRES_DB>_test, never the real database
 
 
 def ensure_env_file() -> bool:
