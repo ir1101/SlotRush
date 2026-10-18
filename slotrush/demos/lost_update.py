@@ -50,19 +50,22 @@ def run() -> int:
     # Chart: (a) admitted vs capacity, (b) the value each admitted bot read, in commit order.
     ok = sorted((commit_times[i], r[1]) for i, r in enumerate(results)
                 if isinstance(r, tuple) and r[0] == "OK")
+    common.write_csv("demo_lost_update_reads.csv",
+                     ["commit_order", "seats_left_read", "should_have_read"],
+                     [(n, seats, max(capacity - n + 1, 0)) for n, (_, seats) in enumerate(ok, 1)])
     fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
     bars = left.bar(["capacity", "admitted", "seats_left\nat the end"],
                     [capacity, admitted, seats_left], width=0.5,
-                    color=[charts.BLUE, charts.CRITICAL, charts.BLUE])
+                    color=[charts.PRIMARY, charts.CRITICAL, charts.PRIMARY])
     charts.label_bars(left, bars)
     left.set_title("Naive path at READ COMMITTED: over-booked")
     left.set_ylabel("students / seats")
     left.set_ylim(0, max(admitted, capacity) * 1.15)
 
     order = range(1, len(ok) + 1)
-    right.plot(order, [seats for _, seats in ok], color=charts.BLUE, marker="o", markersize=4,
+    right.plot(order, [seats for _, seats in ok], color=charts.PRIMARY, marker="o", markersize=4,
                label="seats_left each bot read")
-    right.plot(order, [max(capacity - n + 1, 0) for n in order], color=charts.ORANGE,
+    right.plot(order, [max(capacity - n + 1, 0) for n in order], color=charts.SECONDARY,
                label="what it should have read")
     right.set_title("Every bot read a stale seats_left")
     right.set_xlabel("admitted bots, in commit order")

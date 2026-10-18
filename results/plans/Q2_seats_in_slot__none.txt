@@ -5,15 +5,15 @@ SELECT o.offering_id, o.course_code, o.faculty_id, o.capacity, o.seats_left
             WHERE o.slot_id = %(slot_id)s AND o.semester = %(semester)s AND o.seats_left > 0
             ORDER BY o.seats_left DESC
 
-Sort  (cost=165.23..165.49 rows=104 width=21) (actual time=2.311..2.335 rows=115 loops=1)
+Sort  (cost=165.23..165.49 rows=104 width=21) (actual time=0.428..0.433 rows=115 loops=1)
   Sort Key: seats_left DESC
   Sort Method: quicksort  Memory: 29kB
   Buffers: shared hit=83
-  ->  Seq Scan on offering o  (cost=0.00..161.75 rows=104 width=21) (actual time=0.057..2.186 rows=115 loops=1)
+  ->  Seq Scan on offering o  (cost=0.00..161.75 rows=104 width=21) (actual time=0.014..0.405 rows=115 loops=1)
         Filter: ((seats_left > 0) AND ((slot_id)::text = 'T05'::text) AND ((semester)::text = 'FALL2026'::text))
         Rows Removed by Filter: 4385
         Buffers: shared hit=83
 Planning:
-  Buffers: shared hit=21
-Planning Time: 0.397 ms
-Execution Time: 2.387 ms
+  Buffers: shared hit=19
+Planning Time: 0.111 ms
+Execution Time: 0.444 ms

@@ -1,10 +1,10 @@
-2026-10-17 16:58:18.171 UTC [4217] LOG:  process 4217 detected deadlock while waiting for ShareLock on transaction 3110 after 1000.309 ms
-2026-10-17 16:58:18.171 UTC [4217] DETAIL:  Process holding the lock: 4218. Wait queue: .
-2026-10-17 16:58:18.172 UTC [4218] LOG:  process 4218 still waiting for ShareLock on transaction 3111 after 1000.360 ms
-2026-10-17 16:58:18.172 UTC [4218] DETAIL:  Process holding the lock: 4217. Wait queue: 4218.
-2026-10-17 16:58:18.172 UTC [4217] ERROR:  deadlock detected
-2026-10-17 16:58:18.172 UTC [4217] DETAIL:  Process 4217 waits for ShareLock on transaction 3110; blocked by process 4218.
-	Process 4218 waits for ShareLock on transaction 3111; blocked by process 4217.
-	Process 4217: SELECT register($1, $2)
-	Process 4218: SELECT register($1, $2)
-2026-10-17 16:58:18.172 UTC [4218] LOG:  process 4218 acquired ShareLock on transaction 3111 after 1001.234 ms
+2026-10-18 11:38:54.643 UTC [3708] LOG:  process 3708 detected deadlock while waiting for ShareLock on transaction 6043 after 1000.069 ms
+2026-10-18 11:38:54.643 UTC [3708] DETAIL:  Process holding the lock: 3707. Wait queue: .
+2026-10-18 11:38:54.643 UTC [3707] LOG:  process 3707 still waiting for ShareLock on transaction 6044 after 1000.092 ms
+2026-10-18 11:38:54.643 UTC [3707] DETAIL:  Process holding the lock: 3708. Wait queue: 3707.
+2026-10-18 11:38:54.643 UTC [3708] ERROR:  deadlock detected
+2026-10-18 11:38:54.643 UTC [3708] DETAIL:  Process 3708 waits for ShareLock on transaction 6043; blocked by process 3707.
+	Process 3707 waits for ShareLock on transaction 6044; blocked by process 3708.
+	Process 3708: SELECT register($1, $2)
+	Process 3707: SELECT register($1, $2)
+2026-10-18 11:38:54.643 UTC [3707] LOG:  process 3707 acquired ShareLock on transaction 6044 after 1000.294 ms

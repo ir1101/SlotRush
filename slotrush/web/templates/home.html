@@ -44,6 +44,24 @@
         <p data-guard="serial">{% if r_serial %}The same naive code at SERIALIZABLE: {{ '{:,}'.format(r_serial.retries) }} serialization failures, each one retried after a short pause, in {{ r_serial.seconds }}&nbsp;s.{% else %}Not measured yet: run <code>python -m slotrush serializable</code>.{% endif %}</p>
       </div>
     </div>
+    {% if r_none and r_lock and r_serial %}
+      {# The race replayed (static/race.js), driven by the guard picker above. It needs
+         JavaScript, so without it the figure stays hidden and the text says it all. #}
+      <figure class="race" data-reveal>
+        <div class="readout" aria-hidden="true">
+          <p><span class="v" data-out="seats">{{ r_none.capacity }}</span><span class="k"><code>seats_left</code></span></p>
+          <p><span class="v" data-out="admitted">0</span><span class="k">admitted</span></p>
+          <p><span class="v" data-out="retries">0</span><span class="k">retries</span></p>
+          <p><span class="v" data-out="clock">0.00 s</span><span class="k">measured time</span></p>
+        </div>
+        <figcaption>
+          <p>One square per bot. The counters and the clock come from the saved run; the paths are drawn, not recorded. <span data-out="speed"></span></p>
+          <button class="button small quiet" type="button" data-replay>Replay</button>
+        </figcaption>
+        <canvas role="img" aria-label="A replay of the race: one square per bot moves from the door to one of the seats, or to the bots told FULL."></canvas>
+      </figure>
+      <script type="application/json" id="race-data">{{ races|tojson }}</script>
+    {% endif %}
     <div class="grid12 specimens" aria-hidden="true">
       <div class="specimen left">
         <span class="figure">30</span>
@@ -58,18 +76,9 @@
     </div>
   </section>
 
-  {# ------------------------------------------------------------ a picture of the rush #}
-  <figure class="band">
-    <div class="band-frame"><img class="photo drift" src="{{ url_for('static', filename='img/students-queuing-for-rooms-1972.jpg') }}"
-         width="1920" height="1172" loading="lazy" decoding="async"
-         alt="A long queue of students along a shop-lined street in 1972, stretching out of sight."></div>
-    <figcaption>
-      <p>Students queuing for rooms in Helsinki, 1972. Registration day still has its queue; now it forms on one row of the offering table.</p>
-      <p class="muted">Photograph by Esa Pyysalo / Helsingin Sanomat, public domain, via Wikimedia Commons.</p>
-    </figcaption>
-  </figure>
-
-  {# ------------------------------------------------------------ the total and its receipt #}
+  {# ------------------------------------------------------------ the total and its receipt
+     It starts right under the race, so the olive field cuts the giant numbers the way the
+     seam cuts the headline. #}
   <section class="section receipt-section" aria-labelledby="receipt-title">
     <div class="grid12">
       <div class="receipt-left">
@@ -78,18 +87,23 @@
           <p class="note"><code>check-data</code> ran eight rules over the loaded data and found no clash, no course taken twice and no class over its capacity.</p>
         </div>
         <div data-reveal style="--i:1">
-          <p class="total">{{ '{:,}'.format(receipt_total) }}</p>
+          {# data-count: site.js counts it up from 0 when it scrolls into view. #}
+          <p class="total" data-count="{{ receipt_total }}">{{ '{:,}'.format(receipt_total) }}</p>
           <p class="total-caption">registrations in {{ semester }}, filling {{ '%.0f'|format(100 * stats.taken / stats.seats) }}% of {{ '{:,}'.format(stats.seats) }} seats</p>
         </div>
       </div>
-      <div class="slip" data-reveal style="--i:2">
-        {% for group, rows in receipt %}
-          <h3>{{ group }}</h3>
-          {% for name, code, n in rows %}
-            <div class="row"><span>{{ name }}</span><span class="leader" aria-hidden="true"></span><span class="value">{{ '{:,}'.format(n) }}</span></div>
+      {# The slot hides the slip until it scrolls in, then the slip slides down out of
+         it like a receipt being printed (CSS: .slip-slot.is-in). #}
+      <div class="slip-slot" data-chart>
+        <div class="slip">
+          {% for group, rows in receipt %}
+            <h3>{{ group }}</h3>
+            {% for name, code, n in rows %}
+              <div class="row"><span>{{ name }}</span><span class="leader" aria-hidden="true"></span><span class="value">{{ '{:,}'.format(n) }}</span></div>
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
-        <div class="row total-row"><span>Registrations</span><span class="leader" aria-hidden="true"></span><span class="value">{{ '{:,}'.format(receipt_total) }}</span></div>
+          <div class="row total-row"><span>Registrations</span><span class="leader" aria-hidden="true"></span><span class="value">{{ '{:,}'.format(receipt_total) }}</span></div>
+        </div>
       </div>
     </div>
   </section>
@@ -116,7 +130,7 @@
         <h2 id="wall-title" class="word long">Evidence</h2>
         <a class="caption link" href="/evidence">Everything in results/</a>
       </div>
-      <a class="tile p1" href="/results/demo_lost_update.png" data-reveal style="--i:1">
+      <a class="tile p1" href="/evidence#concurrency-control" data-reveal style="--i:1">
         <span class="word">{{ r_none.admitted if r_none else '?' }}</span>
         <span class="caption">in 30 seats, with no lock</span>
       </a>
@@ -125,15 +139,15 @@
              alt="A steel card-punching registration gauge from the 1960s: twelve rows of digits across eighty numbered columns.">
         <figcaption class="caption">Card-punching registration gauge, 1960s</figcaption>
       </figure>
-      <a class="tile p3" href="/results/demo_deadlock.png" data-reveal style="--i:3">
+      <a class="tile p3" href="/evidence#concurrency-control" data-reveal style="--i:3">
         <span class="word">1</span>
         <span class="caption">deadlock victim, SQLSTATE 40P01</span>
       </a>
-      <a class="tile p4" href="/results/demo_crash.png" data-reveal>
+      <a class="tile p4" href="/evidence#transactions-and-recovery" data-reveal>
         <span class="word">{{ crash.missing if crash else '?' }}</span>
         <span class="caption">acknowledged commits lost to docker kill</span>
       </a>
-      <a class="tile p1" href="/results/demo_crash_async.png" data-reveal style="--i:1">
+      <a class="tile p1" href="/evidence#transactions-and-recovery" data-reveal style="--i:1">
         <span class="word">{{ crash_async.missing if crash_async else '?' }}</span>
         <span class="caption">lost once synchronous_commit is off</span>
       </a>
@@ -142,7 +156,7 @@
              alt="Rows of curved wooden benches rising in an empty university lecture theatre.">
         <figcaption class="caption">A lecture theatre's seats, Edinburgh</figcaption>
       </figure>
-      <a class="tile p2" href="/results/bench_chart.png" data-reveal style="--i:3">
+      <a class="tile p2" href="/evidence#indexing-and-query-processing" data-reveal style="--i:3">
         <span class="word">{{ speedup ~ '×' if speedup else '?' }}</span>
         <span class="caption">faster timetable lookups with an index</span>
       </a>
@@ -160,7 +174,7 @@
         <span class="caption">tests passing</span>
       </a>
       <figure class="tile photo-tile" data-reveal style="--i:3">
-        <img class="photo" src="{{ url_for('static', filename='img/s-mh-and-t-mh-vit-vellore.jpg') }}" width="1920" height="1440" loading="lazy" decoding="async"
+        <img class="photo drift" src="{{ url_for('static', filename='img/s-mh-and-t-mh-vit-vellore.jpg') }}" width="1920" height="1440" loading="lazy" decoding="async"
              alt="Two lit student hostel towers on the VIT Vellore campus at night, bicycles parked along the path between them.">
         <figcaption class="caption">VIT Vellore campus at night</figcaption>
       </figure>
@@ -183,4 +197,6 @@
 {% endblock %}
 
 {% block footer %}{{ footer(credits, me, full=True) }}{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='race.js') }}" defer></script>{% endblock %}
 

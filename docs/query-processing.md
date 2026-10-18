@@ -59,11 +59,11 @@ the leading column of one of these indexes.
 
 | Query | none | B-tree | hash | What decides it |
 |---|---:|---:|---:|---|
-| Q1 student timetable | 58.6 ms | 1.03 ms | 0.84 ms | equality on `registration.reg_no`: any index avoids reading 258,514 rows (~60× faster) |
-| Q2 seats in a slot | 2.44 ms | 0.59 ms | 0.47 ms | equality on `offering.slot_id`; the table is small (4,500 rows) |
-| Q3 course + time range | 48.1 ms | 4.26 ms | 49.2 ms | the **range** on `registered_at`: only the B-tree can serve it (~11× faster); hash = no index |
-| Q4 below min credits | 827 ms | 828 ms | 825 ms | no selective predicate: every row is read in every setup |
-| Q5 faculty class list | 14.4 ms | 12.9 ms | 15.1 ms | the index only replaces a scan of 4,500 offerings; the rest uses PKs |
+| Q1 student timetable | 12.4 ms | 0.19 ms | 0.17 ms | equality on `registration.reg_no`: any index avoids reading 258,514 rows (~64× faster) |
+| Q2 seats in a slot | 0.37 ms | 0.12 ms | 0.08 ms | equality on `offering.slot_id`; the table is small (4,500 rows) |
+| Q3 course + time range | 9.96 ms | 0.83 ms | 10.0 ms | the **range** on `registered_at`: only the B-tree can serve it (~12× faster); hash = no index |
+| Q4 below min credits | 157 ms | 176 ms | 152 ms | no selective predicate: every row is read in every setup |
+| Q5 faculty class list | 2.56 ms | 2.66 ms | 2.29 ms | the index only replaces a scan of 4,500 offerings; the rest uses PKs |
 
 ---
 
@@ -123,7 +123,7 @@ order. Bitmap Index Scan on `ix_registration_reg_no` finds the student's 20 rows
 nested-loop joins probe `offering_pkey`, the course key and `slot_timing_pkey` (an index-only
 scan: every needed column is in the index), then a Sort. Without the secondary index
 (`__none.txt`) the plan is the same except the first step becomes a Seq Scan of all 258,514
-registration rows, which is the whole difference between 58.6 ms and about 1 ms. The hash index
+registration rows, which is the whole difference between 12.4 ms and 0.19 ms. The hash index
 serves the equality just as well as the B-tree.
 
 ## Q2. Seats left in one slot
@@ -194,7 +194,7 @@ flowchart TB
   removed), Seq Scan of offering for the course (63 rows), Hash Join, Sort. Both selections are
   pushed down as in the optimised tree, but each costs a full scan.
 - *btree*: Index Scan on `ix_registration_registered_at` reads only the 2,730 rows in the window,
-  Bitmap Index Scan on `ix_offering_course_code` finds the 63 offerings, Hash Join. 48.1 → 4.3 ms.
+  Bitmap Index Scan on `ix_offering_course_code` finds the 63 offerings, Hash Join. 9.96 → 0.83 ms.
 - *hash*: the course predicate uses the hash index, but registration is back to a **Seq Scan**: a
   hash index stores hash values in no particular order, so it can only answer `=`, never
   `BETWEEN`. The hash index on `registered_at` exists in this setup and is ignored.
@@ -242,7 +242,7 @@ flowchart TB
 (it builds the hash table on the 30,000 students and streams the 258,514 registrations past it;
 "right" because the preserved side is the hashed one), two Hash Left Joins, then HashAggregate
 with the HAVING filter: 7,693 students returned. The indexes cannot help a query that must read
-every row; the differences between setups (825–828 ms) are noise.
+every row; the differences between setups (152–176 ms) are noise.
 
 ## Q5. A faculty member's class list
 
@@ -307,7 +307,7 @@ off) → `student_pkey` (558 probes) → Sort. Note the index condition on offer
 `faculty_id = 1631`: the planner derived it from the join condition, as in the heuristic. Without
 the secondary index the only change is a Seq Scan of offering (4,500 rows), a small part of the
 total; most of the time is the 558 student lookups, which use the PK in every setup. The three
-setups are within run-to-run noise of each other (12.9–15.1 ms).
+setups are within run-to-run noise of each other (2.3–2.7 ms).
 
 ---
 

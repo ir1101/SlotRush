@@ -47,9 +47,13 @@ Full brief: [docs/SPEC.md](docs/SPEC.md). The goal is syllabus evidence
   `nulls`, `bench`, `normalise`, `nosql`, `review`), `demos/` (lost_update, locking,
   serializable, deadlock, crash, shared `common`), `charts.py` (shared chart style).
 - `slotrush/web/`: `app.py` (routes, `create_app(dbname)`), `data.py` (pool, `as_role()`,
-  query log for the "Queries" panel), `templates/`, `static/` (CSS, `site.js`,
-  `img/`). Run: `python -m slotrush web` (port 5000); `.claude/launch.json` has a
-  `slotrush-web` preview config. Tests: `tests/test_web.py` (Flask test client).
+  query log for the "Queries" panel), `figures.py` (evidence charts drawn by the page from
+  the numbers each command saves next to its PNG; `templates/_charts.html` draws them),
+  `templates/`, `static/` (CSS, `site.js`, `race.js` = the home page's race replay, `img/`).
+  Run: `python -m slotrush web` (port 5000); `.claude/launch.json` has a `slotrush-web`
+  preview config. Tests: `tests/test_web.py` (Flask test client), `tests/test_figures.py`.
+- The PNGs in `results/` are for the report; the web page draws the same numbers itself
+  (`data_profile.json`, `demo_*_reads/queue/timeline.csv`, the demo JSONs, bench CSVs).
 - Tests use database `slotrush_test` (rebuilt per session); demos use the main DB.
 - Demo rows: semester `DEMO`, bots `99BOT####`; every demo wipes all demo rows first.
 - Run with the venv's Python: `.venv\Scripts\python` (Windows) or
@@ -76,7 +80,7 @@ Full brief: [docs/SPEC.md](docs/SPEC.md). The goal is syllabus evidence
 - [x] Web front end (after Phase 8, on request): home, log in as, student
   (timetable, credits, drop/swap, catalogue + register), faculty, admin, evidence.
 
-Current status: Phases 0-8 and the web front end built and tested (111 tests);
+Current status: Phases 0-8 and the web front end built and tested (125 tests);
 nothing committed (the user commits). Phase 9 only if the user asks.
 
 ## Machine notes (this Windows laptop)

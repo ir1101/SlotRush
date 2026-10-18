@@ -9,7 +9,7 @@ row lock** (`SELECT … FOR UPDATE` in `register()`).
 
 The locking demo measures what that means: 80 bots on one offering are served strictly one after
 another (`results/demo_locking.png`, the queue of waiting sessions drains in a straight line).
-With a 50 ms transaction that is 5–7 s for just 80 students (`results/demo_locking.json`). For
+With a 50 ms transaction that is about 5 s for just 80 students (4.7 to 7.1 s across our runs, `results/demo_locking.json`). For
 5,000 students wanting the same
 popular course it would be minutes, and long before that the server runs out of connections
 (PostgreSQL starts one process per connection; this project raised `max_connections` from 100
@@ -43,7 +43,7 @@ connections and memory, into a cheap queue at the edge.
 | **Connection pooling** (PgBouncer, `psycopg_pool`) | many clients share a few database connections | each PostgreSQL connection is a whole process |
 | **Short critical sections** | do validation and "think time" outside the transaction; hold the hot row lock only for the update itself | the locking demo holds the lock for 50 ms on purpose; that is what makes it slow |
 | **Ordered locking** | always lock rows in one global order | `swap_course` locks the lower offering id first, so no deadlocks |
-| **Optimistic concurrency** | no locks; detect conflicts and retry (SERIALIZABLE, or a version column) | the serializable demo: correct, faster here, but about 1,300 retries of wasted work (`results/demo_serializable.json`) |
+| **Optimistic concurrency** | no locks; detect conflicts and retry (SERIALIZABLE, or a version column) | the serializable demo: correct, faster here, but about 1,400 retries of wasted work (`results/demo_serializable.json`) |
 | **Asynchronous queues** | requests go into a message queue; one worker per offering applies them in order and reports OK/FULL later | removes lock contention completely; the student gets the answer a few seconds later |
 | **Caching and read replicas** | the course catalogue and seat counts shown while browsing come from a cache or replica, slightly stale | the authoritative check still happens in `register()` on the primary (CAP doc: browse = AP, allot = CP) |
 | **Seat holds with expiry** | a seat is reserved for a few minutes while the user confirms, then released | common in ticketing; would need a `hold_expires_at` column and a cleanup job |

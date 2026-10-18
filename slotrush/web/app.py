@@ -18,7 +18,7 @@ from flask import (Flask, abort, redirect, render_template, request, send_from_d
 from psycopg_pool import PoolTimeout
 
 from ..config import RESULTS_DIR, SEMESTER
-from . import data
+from . import data, figures
 
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 PERIODS = range(1, 9)
@@ -446,7 +446,10 @@ def create_app(dbname: str | None = None) -> Flask:
     def evidence():
         sections = []
         for number, module, files in EVIDENCE:
-            present = [(name, caption, name.endswith(".png"))
+            # A PNG with saved numbers is drawn by the page (figures.py); without them
+            # the PNG itself is shown. Text, CSV and log files are listed as links.
+            present = [{"name": name, "caption": caption, "png": name.endswith(".png"),
+                        "figure": figures.drawn(name)}
                        for name, caption in files if (RESULTS_DIR / name).exists()]
             sections.append((number, module, present))
         report = RESULTS_DIR / "pytest_report.txt"

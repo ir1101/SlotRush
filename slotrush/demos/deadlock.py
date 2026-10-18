@@ -145,6 +145,13 @@ def run() -> int:
     path = common.write_text("demo_deadlock_server_log.txt", "\n".join(log) + "\n")
     print(f"\nServer log lines saved to {path} ({len(log)} lines)")
 
+    # The moments each student began, finished its drop (or got its locks), asked
+    # for the second offering and ended: the numbers behind the timeline chart.
+    common.write_csv("demo_deadlock_timeline.csv",
+                     ["run", "student", "result", "begin_s", "dropped_s", "asked_s", "end_s"],
+                     [(run, name, outcome[name][0],
+                       *(f"{outcome[name][1][k]:.3f}" for k in ("begin", "dropped", "asked", "end")))
+                      for run, outcome in (("naive", naive), ("swap", swaps)) for name in "AB"])
     timeline_chart(naive, swaps)
     both_swapped = all(s[0].startswith("committed (OK") for s in swaps.values())
     return 0 if len(victims) == 1 and both_swapped else 1
@@ -158,11 +165,11 @@ def timeline_chart(naive, swaps) -> None:
         for row, name in enumerate("BA"):
             result, t, _ = outcome[name]
             if outcome is naive:
-                spans = [(t["begin"], t["dropped"], charts.BLUE),       # drop: holds a lock
-                         (t["asked"], t["end"], charts.ORANGE)]         # waiting in register()
+                spans = [(t["begin"], t["dropped"], charts.PRIMARY),       # drop: holds a lock
+                         (t["asked"], t["end"], charts.SECONDARY)]         # waiting in register()
             else:
-                spans = [(t["asked"], t["dropped"], charts.ORANGE),     # inside swap_course
-                         (t["dropped"], t["end"], charts.BLUE)]         # holding locks
+                spans = [(t["asked"], t["dropped"], charts.SECONDARY),     # inside swap_course
+                         (t["dropped"], t["end"], charts.PRIMARY)]         # holding locks
             for x0, x1, colour in spans:
                 ax.broken_barh([(x0, max(x1 - x0, 0.01))], (row - 0.2, 0.4), color=colour)
             ax.annotate(result, xy=(t["end"], row), xytext=(6, 0), textcoords="offset points",
@@ -172,7 +179,7 @@ def timeline_chart(naive, swaps) -> None:
         ax.set_xlim(0, max(o[1]["end"] for o in outcome.values()) * 1.6)
         ax.grid(axis="y", visible=False)
     axes[1].set_xlabel("seconds")
-    fig.legend(handles=[Patch(color=charts.BLUE, label="working, holding row locks"),
-                        Patch(color=charts.ORANGE, label="blocked, waiting for a row lock")],
+    fig.legend(handles=[Patch(color=charts.PRIMARY, label="working, holding row locks"),
+                        Patch(color=charts.SECONDARY, label="blocked, waiting for a row lock")],
                loc="outside upper right", ncols=2)
     print(f"Chart: {charts.save(fig, 'demo_deadlock.png')}")

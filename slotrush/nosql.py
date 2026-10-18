@@ -226,14 +226,14 @@ def run() -> int:
 def chart(results: dict) -> None:
     fig, (left, right) = charts.figure(ncols=2, width=11, height=4.2)
     tags = list(reversed(results["most_common_tags"]))
-    left.barh([t["_id"] for t in tags], [t["count"] for t in tags], height=0.5, color=charts.BLUE)
+    left.barh([t["_id"] for t in tags], [t["count"] for t in tags], height=0.5, color=charts.PRIMARY)
     left.set_title("Most common review tags")
     left.set_xlabel("reviews")
     left.grid(axis="y", visible=False)
 
     by_type = results["rating_by_course_type"]
     bars = right.bar([t["_id"] for t in by_type], [round(t["avg_rating"], 2) for t in by_type],
-                     width=0.5, color=charts.BLUE)
+                     width=0.5, color=charts.PRIMARY)
     charts.label_bars(right, bars, "{:.2f}")
     right.set_ylim(0, 5)
     right.set_title("Average rating by course type")

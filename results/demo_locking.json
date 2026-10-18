@@ -4,7 +4,8 @@
   "bots": 80,
   "admitted": 30,
   "seats_left": 0,
-  "seconds": 7.098,
+  "seconds": 4.717,
   "retries": 0,
-  "max_waiting": 79
+  "max_waiting": 79,
+  "full": 50
 }

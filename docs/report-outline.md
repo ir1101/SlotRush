@@ -50,7 +50,7 @@ Every file below is produced by a command (shown in brackets) and can be regener
 - `results/bench_chart.png`, `results/bench_summary.csv`, `results/bench_timings.csv` (`bench`).
 - `results/plans/<query>__<setup>.txt`: `EXPLAIN (ANALYZE, BUFFERS)` for 5 queries × 3 setups.
 - Key observations: B-tree and hash both help equality (Q1 about 60× faster); only the B-tree
-  helps the range query (Q3 about 11× faster with a B-tree, no gain with hash); no index helps a
+  helps the range query (Q3 about 12× faster with a B-tree, no gain with hash); no index helps a
   full aggregation (Q4). Compare setups within one run; absolute times vary between runs.
 
 ## 5. Transactions and recovery

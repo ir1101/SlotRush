@@ -7,33 +7,33 @@ SELECT r.reg_no, r.registered_at, o.offering_id, o.slot_id
               AND r.registered_at BETWEEN %(t_from)s AND %(t_to)s
             ORDER BY r.registered_at
 
-Gather Merge  (cost=5060.01..5062.54 rows=22 width=26) (actual time=40.595..49.577 rows=40 loops=1)
+Gather Merge  (cost=5077.03..5079.56 rows=22 width=26) (actual time=7.718..9.177 rows=40 loops=1)
   Workers Planned: 1
   Workers Launched: 1
-  Buffers: shared hit=1751
-  ->  Sort  (cost=4060.00..4060.05 rows=22 width=26) (actual time=31.862..31.872 rows=20 loops=2)
+  Buffers: shared hit=1768
+  ->  Sort  (cost=4077.02..4077.07 rows=22 width=26) (actual time=6.131..6.134 rows=20 loops=2)
         Sort Key: r.registered_at
         Sort Method: quicksort  Memory: 26kB
-        Buffers: shared hit=1751
+        Buffers: shared hit=1768
         Worker 0:  Sort Method: quicksort  Memory: 25kB
-        ->  Hash Join  (cost=87.33..4059.51 rows=22 width=26) (actual time=26.015..31.682 rows=20 loops=2)
+        ->  Hash Join  (cost=87.33..4076.53 rows=22 width=26) (actual time=5.078..6.112 rows=20 loops=2)
               Hash Cond: (r.offering_id = o.offering_id)
-              Buffers: shared hit=1743
-              ->  Parallel Seq Scan on registration r  (cost=0.00..3968.01 rows=1589 width=22) (actual time=25.602..30.805 rows=1365 loops=2)
+              Buffers: shared hit=1760
+              ->  Parallel Seq Scan on registration r  (cost=0.00..3985.01 rows=1598 width=22) (actual time=4.992..5.957 rows=1365 loops=2)
                     Filter: ((registered_at >= '2026-07-06 15:30:00+00'::timestamp with time zone) AND (registered_at <= '2026-07-06 16:00:00+00'::timestamp with time zone))
                     Rows Removed by Filter: 127892
-                    Buffers: shared hit=1687
-              ->  Hash  (cost=86.54..86.54 rows=63 width=8) (actual time=0.200..0.202 rows=63 loops=2)
+                    Buffers: shared hit=1704
+              ->  Hash  (cost=86.54..86.54 rows=63 width=8) (actual time=0.040..0.041 rows=63 loops=2)
                     Buckets: 1024  Batches: 1  Memory Usage: 11kB
                     Buffers: shared hit=8
-                    ->  Bitmap Heap Scan on offering o  (cost=4.49..86.54 rows=63 width=8) (actual time=0.118..0.156 rows=63 loops=2)
+                    ->  Bitmap Heap Scan on offering o  (cost=4.49..86.54 rows=63 width=8) (actual time=0.025..0.032 rows=63 loops=2)
                           Recheck Cond: ((course_code)::text = 'BCHY104P'::text)
                           Heap Blocks: exact=1
                           Buffers: shared hit=8
-                          ->  Bitmap Index Scan on ix_offering_course_code  (cost=0.00..4.47 rows=63 width=0) (actual time=0.063..0.063 rows=63 loops=2)
+                          ->  Bitmap Index Scan on ix_offering_course_code  (cost=0.00..4.47 rows=63 width=0) (actual time=0.013..0.013 rows=63 loops=2)
                                 Index Cond: ((course_code)::text = 'BCHY104P'::text)
                                 Buffers: shared hit=6
 Planning:
-  Buffers: shared hit=24
-Planning Time: 0.942 ms
-Execution Time: 49.665 ms
+  Buffers: shared hit=28
+Planning Time: 0.166 ms
+Execution Time: 9.197 ms

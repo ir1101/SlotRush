@@ -1,7 +1,10 @@
 """One shared look for every chart saved to results/.
 
-Colours come from a colour-blind-checked categorical palette, used in a fixed
-order. Text is always dark grey or black, never the series colour.
+The charts use the web front end's colours, so they sit naturally on its
+evidence page and in the report: olive ink on a bone background. The three
+series colours were checked with a colour-blindness validator against the bone
+background (all pairs pass); they are used in this fixed order. Text is always
+in the ink colour, never in a series colour.
 """
 import matplotlib
 
@@ -10,28 +13,32 @@ import matplotlib.pyplot as plt  # noqa: E402  (must come after matplotlib.use)
 
 from .config import RESULTS_DIR  # noqa: E402
 
-# Categorical colours, always assigned in this order (slot 1 first).
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
-BLUE, ORANGE, AQUA, YELLOW = SERIES[:4]
+# Series colours, always assigned in this order.
+PRIMARY = "#4f6b10"       # olive
+SECONDARY = "#2d6db0"     # blue
+TERTIARY = "#c27a2c"      # ochre (below 3:1 on bone, so bars carrying it are always labelled)
+SERIES = [PRIMARY, SECONDARY, TERTIARY]
 
-# Status colours, kept apart from the series colours. Always paired with a text label.
-GOOD = "#0ca30c"
-CRITICAL = "#d03b3b"
+# Status colours. GOOD reuses the olive; CRITICAL is a brick red kept apart from the series.
+GOOD = PRIMARY
+CRITICAL = "#a3361f"
 
-SURFACE = "#fcfcfb"      # chart background
-INK = "#0b0b0b"          # titles and values
-INK_2 = "#52514e"        # axis labels, legend text
-MUTED = "#898781"        # tick labels
-GRID = "#e1e0d9"         # hairline gridlines
-AXIS = "#c3c2b7"         # baseline
+SURFACE = "#ecebe7"      # bone: chart background, the same as the web page
+INK = "#38450f"          # titles and values
+INK_2 = "#5d683a"        # axis labels, legend text
+MUTED = "#6b7350"        # tick labels
+GRID = "#d8d5cc"         # gridlines, one tone step off the background
+AXIS = "#b9b6aa"         # baseline
 
 plt.rcParams.update({
     "figure.facecolor": SURFACE,
     "axes.facecolor": SURFACE,
     "savefig.facecolor": SURFACE,
+    # The site's Libre Franklin is a web font; these are close system faces.
     "font.family": "sans-serif",
+    "font.sans-serif": ["Libre Franklin", "Segoe UI", "Helvetica Neue", "Arial", "DejaVu Sans"],
     "font.size": 10,
-    "axes.titlesize": 11,
+    "axes.titlesize": 12,
     "axes.titleweight": "bold",
     "axes.titlecolor": INK,
     "axes.titlelocation": "left",

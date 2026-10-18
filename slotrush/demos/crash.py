@@ -181,7 +181,7 @@ def chart(logged, found, missing, unlogged, kill_at, log_file, chart_name) -> No
     with log_file.open(newline="", encoding="utf-8") as f:
         times = sorted(float(row["acknowledged_at_s"]) for row in csv.DictReader(f))
     fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
-    left.plot(times, range(1, len(times) + 1), color=charts.BLUE)
+    left.plot(times, range(1, len(times) + 1), color=charts.PRIMARY)
     left.axvline(kill_at, color=charts.CRITICAL, linewidth=1.5)
     # Commits already in flight still finish while docker kill is being carried out.
     left.annotate("docker kill issued", xy=(kill_at, 0.05), xycoords=("data", "axes fraction"),
@@ -194,7 +194,7 @@ def chart(logged, found, missing, unlogged, kill_at, log_file, chart_name) -> No
     labels = ["logged\n(acknowledged)", "found after\nrestart", "logged but\nmissing",
               "in table,\nnot logged"]
     values = [logged, found, missing, unlogged]
-    colours = [charts.BLUE, charts.BLUE, charts.CRITICAL if missing else charts.GOOD, charts.AQUA]
+    colours = [charts.PRIMARY, charts.PRIMARY, charts.CRITICAL if missing else charts.GOOD, charts.TERTIARY]
     bars = right.bar(labels, values, width=0.5, color=colours)
     charts.label_bars(right, bars)
     right.set_title("After WAL recovery: nothing acknowledged was lost"

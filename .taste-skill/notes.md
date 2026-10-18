@@ -111,3 +111,15 @@ Size adjustments: five steps (small, body, head, display, mega). The receipt tot
 students using the measured outcome from results/demo_*.json: no lock overfills to 80 in 30 seats,
 row lock fills 30 and lists 50 on the waitlist, serializable fills 30 and counts the retries.
 Fallback without script: the three outcomes as plain sentences.
+Built on 2026-10-18 as a canvas replay (static/race.js) under the guard picker: counters, clock
+and totals from results/, paths drawn with a fixed seed, real speed for the row lock and slowed
+(and labelled) for the other two. Reduced motion shows the end state only.
+
+## Motion and drawn charts (2026-10-18, /emil-design-eng)
+- The evidence charts are drawn by the page (web/figures.py + _charts.html), not PNGs. Ink on bone,
+  red only for a wrong result, hatching for waiting / turned away. Bars grow, lines draw left to
+  right, bench dots travel from "no index" to their own time, the deadlock replays in real time.
+- Home: the race replay, the receipt prints out of its slot, the total counts up.
+- Lint 0/0. Inspect home: 0 FAIL, same two defended WARNs. Inspect evidence: few-pictures and
+  empty-screens allowed: it is a data page whose pictures are the charts, and the captures
+  (650 ms after each scroll) catch marks mid-flight.

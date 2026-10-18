@@ -14,6 +14,12 @@
   --field: #38450f;           /* inverted fields: stats, close, footer */
   --field-ink: #ecebe7;
 
+  /* Charts only: a reference tone, the one warning colour (a wrong result), and
+     diagonal hatching for "waiting" or "turned away". */
+  --soft: #7d8456;            /* 3.3:1 on bone */
+  --critical: #a3361f;
+  --hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M-2 2l4-4M0 8l8-8M6 10l4-4' stroke='%2338450f' stroke-width='2.4'/%3E%3C/svg%3E");   /* tile: one diagonal stroke */
+
   --display: "Libre Franklin", "Arial Narrow", Arial, sans-serif;
   --text: "Source Serif 4", Georgia, "Times New Roman", serif;
 
@@ -212,6 +218,17 @@ code { font-size: inherit; }
   }
 }
 @keyframes swap { from { opacity: 0; transform: translateY(0.12em); } to { opacity: 1; transform: none; } }
+
+/* The race, replayed on a canvas by race.js. Hidden without JavaScript. */
+.race { display: none; margin: 6rem 0 0; }
+.js .race { display: block; }
+.race .readout { display: flex; flex-wrap: wrap; gap: 1rem 3.5rem; margin-bottom: 2rem; }
+.race .readout p { display: flex; flex-direction: column; gap: 0.375rem; }
+.race .readout .v { font: 700 var(--step-head)/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; min-width: 4ch; }
+.race .readout .k { font-size: var(--step-small); color: var(--muted); }
+.race canvas { display: block; width: 100%; }
+.race figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem 2rem; margin-bottom: 2.5rem; font-size: var(--step-small); color: var(--muted); }
+.race figcaption p { max-width: 48em; }
 @media (max-width: 48rem) {
   .showcase h2, .showcase .intro, .guards, .outcome { grid-column: 1 / -1; }
   .specimens { height: auto; margin-top: 6rem; row-gap: 2rem; }
@@ -220,17 +237,11 @@ code { font-size: inherit; }
   .specimen.right .frame { background: var(--ink); color: var(--bg); padding: 0 0.5rem; }
 }
 
-/* ---------- full-bleed photograph band (the moving picture: a slow drift) */
-.band { position: relative; margin: 0; }
-.band-frame { overflow: hidden; background: var(--ink); }      /* keeps the drifting photo inside */
-.band img { width: 100%; height: min(86svh, 56vw); object-fit: cover; }
-.band figcaption { padding: 1rem var(--margin) 0; color: var(--ink); background: var(--bg); font-size: var(--step-small); }
-.band figcaption p { max-width: 60em; }
-.band figcaption p:first-child { font-size: var(--step-body); margin-bottom: 0.25rem; }
+/* The moving picture: one wall photograph drifts slowly as it passes through the screen. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .drift { animation: drift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
-    @keyframes drift { from { transform: scale(1.08) translateY(-3%); } to { transform: scale(1.08) translateY(3%); } }
+    @keyframes drift { from { transform: scale(1.12) translateY(-4%); } to { transform: scale(1.12) translateY(4%); } }
   }
 }
 
@@ -238,15 +249,20 @@ code { font-size: inherit; }
 .photo { filter: grayscale(1) contrast(1.08); }
 
 /* ---------- stats: the total and its receipt */
-.receipt-section { background: var(--field); color: var(--field-ink); margin-top: var(--section-gap); }
+.receipt-section { background: var(--field); color: var(--field-ink); }   /* starts right under the race: the field cuts the giant numbers */
 .receipt-section .grid12 { align-items: stretch; }
 .receipt-left { grid-column: 1 / span 6; display: flex; flex-direction: column; justify-content: space-between; gap: 4rem; min-height: 38rem; }
 .receipt-left h2 { font-size: var(--step-head); }
 .receipt-left .note { margin-top: 1rem; max-width: 30em; }
 .total { font: 700 var(--step-display)/0.8 var(--display); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
 .total-caption { margin-top: 1rem; }
+.slip-slot { grid-column: 8 / span 4; align-self: start; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Printed: the slip slides down out of its slot, zigzag edge first. */
+  .js .slip-slot .slip { transform: translateY(-100%); transition: transform 1800ms var(--ease-out) 150ms; }
+  .js .slip-slot.is-in .slip { transform: none; }
+}
 .slip {
-  grid-column: 8 / span 4; align-self: start;
   background: var(--bg); color: var(--ink);
   padding: 1.75rem 1.5rem 3rem;
   /* zigzag bottom edge */
@@ -264,9 +280,9 @@ code { font-size: inherit; }
 .slip .row.total-row { margin-top: 1rem; padding: 0.625rem 0.75rem; background: var(--ink); color: var(--bg); font-weight: 600; }
 .slip .row.total-row .leader { background-image: none; }
 @media (max-width: 48rem) {
-  .receipt-left, .slip { grid-column: 1 / -1; }
+  .receipt-left, .slip-slot { grid-column: 1 / -1; }
   .receipt-left { min-height: 0; gap: 2.5rem; }
-  .slip { margin-top: 3rem; }
+  .slip-slot { margin-top: 3rem; }
 }
 
 /* ---------- poster list */
@@ -475,15 +491,164 @@ input::placeholder { color: var(--muted); }
 .empty-state { background: var(--surface); padding: 2.5rem 2rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; }
 .empty-state p { font-size: 1.125rem; max-width: 36em; }
 
-/* Evidence gallery */
-.evidence-module { margin-top: 5rem; }
+/* Evidence page */
+.evidence-module { margin-top: 6rem; scroll-margin-top: 2rem; }
+.evidence-module h2 { margin-bottom: 2.5rem; }
 .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 36rem), 1fr)); gap: var(--margin); }
 .gallery figure { margin: 0; }
 .gallery figcaption { margin-top: 0.75rem; }
 .files { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 4px; }
 .files a { display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; padding: 1rem 1.25rem; background: var(--surface); text-decoration: none; transition: background-color var(--t-hover) ease; }
-.files a strong { font-family: var(--display); }
+.files li { min-width: 0; }
+.files a strong { font-family: var(--display); overflow-wrap: anywhere; }   /* long plan file names wrap on a phone */
 @media (hover: hover) and (pointer: fine) { .files a:hover { background: #d4d1c9; } }
+
+/* ------------------------------------------------------------------ charts drawn by the page
+   (templates/_charts.html). No boxes and no gridlines: bars stand on the page, values
+   sit on the bars, an axis is a few labels. Ink for the data, red only for a wrong result. */
+.chart { margin: 0 0 5rem; }
+.chart .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 3.5rem var(--margin); }
+.panel h3 { font: 700 var(--step-body)/1.2 var(--display); letter-spacing: -0.01em; }
+.panel .note { margin-top: 0.25rem; font-size: var(--step-small); color: var(--muted); }
+.chart figcaption { margin-top: 2rem; max-width: 46em; }
+.chart figcaption .source { margin-top: 0.375rem; font-size: var(--step-small); color: var(--muted); }
+.chart figcaption .source a { color: var(--ink); }
+
+/* the marks' tones */
+.chart .fill, .key li::before { background: var(--ink); }
+.chart .fill.soft, .key .soft::before { background: var(--soft); }
+.chart .fill.critical, .key .critical::before { background: var(--critical); }
+.chart .fill.hatch, .tl-span.hatch, .key .hatch::before { background: var(--hatch); }
+
+.key { list-style: none; display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin: 0.625rem 0 0; padding: 0; font-size: var(--step-small); }
+.key li::before { content: ""; display: inline-block; width: 1rem; height: 0.75rem; margin-right: 0.5rem; vertical-align: -0.05em; }
+.key .dashed::before { height: 3px; vertical-align: 0.25em; background: repeating-linear-gradient(90deg, var(--ink) 0 5px, transparent 5px 8px); } /* taste-skill-ignore: dashed key swatch: hard stops */
+.key .none::before { width: 0.875rem; height: 0.875rem; border-radius: 50%; background: radial-gradient(circle, var(--bg) 0 42%, var(--ink) 45%); } /* taste-skill-ignore: ring dot: hard stops */
+.key .btree::before { width: 0.875rem; height: 0.875rem; border-radius: 50%; }
+.key .hash::before { width: 0.75rem; height: 0.75rem; background: var(--muted); transform: rotate(45deg) scale(0.9); }
+
+/* values and axis labels */
+.chart .value { font: 700 var(--step-small)/1 var(--display); font-variant-numeric: tabular-nums; }
+.axis-x, .axis-y { font-size: var(--step-small); color: var(--muted); font-variant-numeric: tabular-nums; }
+.axis-x { position: relative; height: 1.75rem; }
+.axis-x span { position: absolute; top: 0.5rem; transform: translateX(-50%); white-space: nowrap; line-height: 1; }
+.axis-x span.start { transform: none; }
+.axis-x span.end { transform: translateX(-100%); }
+.axis-y { position: relative; }
+.axis-y span { position: absolute; right: 0.625rem; transform: translateY(50%); line-height: 1; }
+.axis-title { font-size: var(--step-small); color: var(--muted); text-align: center; }
+
+/* a chart with axes: unit on top, y labels | plot area, then x labels and the x title */
+.axes { display: grid; grid-template-columns: 3rem minmax(0, 1fr); margin-top: 1rem; }
+.axes > .unit, .axes > .axis-x, .axes > .axis-title { grid-column: 2; }
+.axes > .unit { font-size: var(--step-small); color: var(--muted); margin-bottom: 0.75rem; }
+.axes > .area { position: relative; height: 13rem; }
+
+/* a moment or a limit marked across the plot, labelled beside its line */
+.marker { position: absolute; top: -0.75rem; bottom: 0; width: 3px; margin-left: -1.5px; background: var(--ink); }
+.marker.critical { background: var(--critical); }
+.marker span { position: absolute; top: 0; left: 0.5rem; white-space: nowrap; font-size: var(--step-small); line-height: 1; }
+.marker.flip span { left: auto; right: 0.5rem; }
+
+/* ---------- a few labelled bars */
+.vbars { margin-top: 1rem; max-width: 30rem; }          /* slim bars, not blocks */
+.vbars .plot { height: 13rem; padding-top: 1.75rem; }
+.vbars .tracks, .vbars .labels { display: flex; gap: clamp(0.75rem, 2.5vw, 1.75rem); }
+.vbars .tracks { position: relative; height: 100%; }
+.vbars .track { position: relative; flex: 1; }
+.vbars .fill { position: absolute; left: 0; right: 0; bottom: 0; height: var(--h); }
+.vbars .value { position: absolute; left: 0; right: 0; bottom: calc(var(--h) + 0.5rem); text-align: center; }
+.vbars .rule { position: absolute; left: -0.5rem; right: -0.5rem; bottom: var(--h); height: 3px; margin-bottom: -1.5px; background: var(--ink); }
+.vbars .labels { margin-top: 0.75rem; }
+.vbars .labels span { flex: 1; text-align: center; font-size: var(--step-small); line-height: 1.3; }
+
+/* ---------- histogram */
+.hist-bars { position: absolute; inset: 0; display: flex; align-items: flex-end; gap: 3px; }
+.hist-bars .fill { flex: 1; height: var(--h); }
+
+/* ---------- lines (SVG) */
+.axes svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.axes .shade { fill: var(--ink); fill-opacity: 0.12; }
+.axes .series { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.axes .series.critical { stroke: var(--critical); }
+.axes .series.dashed { stroke-width: 2; stroke-dasharray: 6 5; }
+
+/* ---------- horizontal bars */
+.hbars { margin-top: 1rem; display: grid; gap: 0.5rem; }
+.hbar { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) 3rem; gap: 1rem; align-items: center; }
+.hbar .label { font-size: var(--step-small); line-height: 1.25; }
+.hbar .track { position: relative; height: 1.25rem; }
+.hbar .fill { position: absolute; inset: 0 auto 0 0; width: var(--w); }
+.hbar .value { text-align: right; }
+
+/* ---------- the index benchmark: a dot per setup on a log scale */
+.dot-chart { margin-top: 1.25rem; }
+.dot-row, .dot-axis { display: grid; grid-template-columns: minmax(0, 21rem) minmax(0, 1fr); gap: 0.375rem 2rem; align-items: center; }
+.dot-row { padding: 0.75rem 0; }
+.dot-label strong { display: block; font: 700 var(--step-body)/1.2 var(--display); letter-spacing: -0.01em; }
+.dot-label span { font-size: var(--step-small); color: var(--muted); font-variant-numeric: tabular-nums; }
+.dot-track { overflow: hidden; padding: 0 0.75rem; margin: 0 -0.75rem; }
+.dot-track .lane { position: relative; height: 1.5rem; }
+.dot-track .range { position: absolute; top: 50%; height: 0.625rem; margin-top: -0.3125rem; background: var(--surface); }
+/* A .dot is as wide as its track, so translateX(%) is a share of the track's width. */
+.dot { position: absolute; inset: 0; transform: translateX(var(--x)); pointer-events: none; }
+.dot::before { content: ""; position: absolute; top: 50%; left: -0.5625rem; width: 1.125rem; height: 1.125rem; margin-top: -0.5625rem; border-radius: 50%; background: var(--ink); }
+.dot.none::before { background: radial-gradient(circle, var(--bg) 0 42%, var(--ink) 45%); } /* taste-skill-ignore: ring dot: hard stops */
+.dot.hash::before { border-radius: 0; background: var(--muted); transform: rotate(45deg) scale(0.8); }
+.dot-axis .axis-x { grid-column: 2; }
+
+/* ---------- the deadlock timeline */
+.timeline { margin-top: 1.25rem; }
+.tl-run + .tl-run { margin-top: 2.25rem; }
+.tl-title { font-weight: 600; }
+.tl-row, .tl-axis { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.25rem 1rem; align-items: center; }
+.tl-row { margin-top: 0.875rem; }
+.tl-who { font-size: var(--step-small); }
+.tl-track { position: relative; height: 1.75rem; }
+.tl-span { position: absolute; top: 0; bottom: 0; background: var(--ink); }
+.tl-result { grid-column: 2; font-size: var(--step-small); }
+.tl-axis { margin-top: 1rem; }
+.tl-axis > * { grid-column: 2; }
+
+@media (max-width: 48rem) {
+  .dot-row, .dot-axis { grid-template-columns: minmax(0, 1fr); }
+  .dot-axis .axis-x { grid-column: 1; }
+  .hbar { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) 2.5rem; gap: 0.75rem; }
+  .tl-row, .tl-axis { grid-template-columns: 4.5rem minmax(0, 1fr); }
+}
+
+/* ---------- chart motion: drawn once, when the figure is well inside the window.
+   Explanatory, seen once per visit, so slower than interface motion. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Titles, axes and labels are there from the start; only the data draws itself in. */
+  /* bars grow from the baseline, panel by panel and bar by bar; values land after them */
+  .js .chart .vbars .fill { transform: scaleY(0); transform-origin: bottom; transition: transform 900ms var(--ease-out) calc(var(--p, 0) * 160ms + var(--i, 0) * 90ms + 250ms); }
+  .js .chart .hist-bars .fill { transform: scaleY(0); transform-origin: bottom; transition: transform 700ms var(--ease-out) calc(var(--p, 0) * 160ms + var(--i, 0) * 22ms + 250ms); }
+  .js .chart .hbar .fill { transform: scaleX(0); transform-origin: left; transition: transform 900ms var(--ease-out) calc(var(--i, 0) * 60ms + 250ms); }
+  .js .chart .value, .js .chart .rule, .js .chart .marker { opacity: 0; transition: opacity 400ms ease calc(var(--p, 0) * 160ms + var(--i, 0) * 90ms + 900ms); }
+  .js .chart.is-in .fill { transform: none; }
+  .js .chart.is-in .value, .js .chart.is-in .rule { opacity: 1; }
+
+  /* lines draw left to right, the way the time went; the marked moment shows when the line reaches it */
+  /* (the -8px margins keep a line along the very edge from being cut in half) */
+  .js .chart .axes svg { clip-path: inset(-8px 100% -8px -8px); transition: clip-path 1600ms var(--ease-in-out) calc(var(--p, 0) * 160ms + 250ms); }
+  .js .chart.is-in .axes svg { clip-path: inset(-8px); }
+  .js .chart .axes .marker { transition-delay: calc(var(--p, 0) * 160ms + 1300ms); }
+  .js .chart.is-in .marker { opacity: 1; }
+
+  /* the benchmark: every setup starts where "no index" is and travels to its own time */
+  .js .chart .dot { transform: translateX(var(--from)); opacity: 0;
+    transition: transform 1200ms var(--ease-in-out) calc(var(--i, 0) * 90ms + 650ms), opacity 300ms ease calc(var(--i, 0) * 90ms + 250ms); }
+  .js .chart.is-in .dot { transform: translateX(var(--x)); opacity: 1; }
+  .js .chart .dot-track .range { opacity: 0; transition: opacity 400ms ease calc(var(--i, 0) * 90ms + 1700ms); }
+  .js .chart.is-in .dot-track .range { opacity: 1; }
+
+  /* the deadlock in real time: each span grows over the seconds it really took */
+  .js .chart .tl-span { transform: scaleX(0); transform-origin: left; transition: transform var(--seconds) linear calc(var(--start) + 400ms); }
+  .js .chart .tl-result { opacity: 0; transition: opacity 300ms ease calc(var(--start) + 400ms); }
+  .js .chart.is-in .tl-span { transform: none; }
+  .js .chart.is-in .tl-result { opacity: 1; }
+}
 
 /* Queries this page ran */
 .queries { margin-top: 6rem; background: var(--surface); padding: 0 1.5rem; }

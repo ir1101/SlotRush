@@ -114,15 +114,17 @@ lists the exact SQL it ran and as which role.
 
 - Pages: home (live counts), log in as, student (timetable, credits meter, drop, swap),
   catalogue (search and register), faculty (class lists), admin (seat fill), evidence
-  (everything in `results/`).
+  (everything in `results/`; the charts are drawn by the page from the numbers each command
+  saves, and link to the PNG versions for the report).
 - The look was designed with the taste-skill process (notes and direction sheet in
   `.taste-skill/`): olive on bone, Libre Franklin for display and Source Serif 4 for text
   (Google Fonts; without internet they fall back to system fonts). The home page opens on
   "30 seats, 80 students" and lets you pick a guard (no lock, row lock, serializable) to see what
-  the concurrency demos measured; it reads the numbers from `results/`.
-- Five found photographs (public domain, CC0 and CC BY) are in `slotrush/web/static/img/`, with
+  the concurrency demos measured, with a replay of the 80 bots racing for the 30 seats; it reads
+  the numbers from `results/`. All motion respects the system's reduced-motion setting.
+- Four found photographs (public domain, CC0 and CC BY) are in `slotrush/web/static/img/`, with
   their sources and licences in `credits.json`; the footer credits each one. They show the world
-  around the project (queues, punched cards, lecture seats, the VIT campus), never SlotRush itself.
+  around the project (punched cards, lecture seats, the VIT campus), never SlotRush itself.
 - It is a single-user demo on `127.0.0.1`: the development server, no CSRF tokens, and a new
   session key on every start (restarting signs everyone out).
 
