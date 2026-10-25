@@ -94,6 +94,7 @@ ORDER BY t.day, t.period;
 ```mermaid
 flowchart TB
     subgraph canonical["Canonical tree"]
+        direction TB
         p1["π day, period, slot_id, course_code, title, venue"] --> s1["σ R.reg_no = '23BEE0595' ∧ R.offering_id = O.offering_id<br/>∧ C.course_code = O.course_code ∧ T.slot_id = O.slot_id"]
         s1 --> x3["×"]
         x3 --> x2["×"]
@@ -108,6 +109,7 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph optimised["Heuristically optimised tree"]
+        direction TB
         p2["π day, period, slot_id, course_code, title, venue"] --> j3["⋈ O.slot_id = T.slot_id"]
         j3 --> j2["⋈ O.course_code = C.course_code"]
         j3 --> T2["T"]
@@ -135,20 +137,52 @@ WHERE o.slot_id = 'T05' AND o.semester = 'FALL2026' AND o.seats_left > 0
 ORDER BY o.seats_left DESC;
 ```
 
-**Relational algebra**: τ<sub>seats_left DESC</sub> π<sub>offering_id, course_code, faculty_id, capacity, seats_left</sub>
+**Relational algebra (canonical)**
+
+τ<sub>seats_left DESC</sub> π<sub>offering_id, course_code, faculty_id, capacity, seats_left</sub>
 σ<sub>slot_id='T05' ∧ semester='FALL2026' ∧ seats_left>0</sub>(O)
 
-With one relation the canonical and optimised trees are the same shape; the only heuristic step
-is to apply the most selective conjunct (slot_id) through an index and the others as filters.
+**Optimised.** With one table there is no × to turn into a join, nothing to push below a join,
+and the π already sits directly above the selections. One heuristic still changes the tree:
+step (1) splits the σ into a cascade of three. σ is commutative, so every order of the cascade
+gives the same rows; the heuristic puts the most selective condition first, closest to the table,
+so each later test sees as few rows as possible:
+
+τ<sub>seats_left DESC</sub> π<sub>…</sub>
+σ<sub>semester='FALL2026'</sub>( σ<sub>seats_left>0</sub>( σ<sub>slot_id='T05'</sub>(O) ) )
+
+| Condition | Offerings it keeps on its own |
+|---|---:|
+| `slot_id = 'T05'` | 159 of 4,500 (3.5%) |
+| `seats_left > 0` | 2,953 of 4,500 (66%) |
+| `semester = 'FALL2026'` | 4,500 of 4,500 (all: the only other semester is `DEMO`, used by the demos) |
+
+Applied in that order, the rows go 4,500 → 159 → 115 → 115.
 
 ```mermaid
 flowchart TB
-    p["π offering_id, course_code, faculty_id, capacity, seats_left"] --> s["σ slot_id = 'T05' ∧ semester = 'FALL2026' ∧ seats_left > 0"] --> O["O (offering)"]
+    subgraph canonical["Canonical tree"]
+        direction TB
+        p1["π offering_id, course_code, faculty_id, capacity, seats_left"] --> s1["σ slot_id = 'T05' ∧ semester = 'FALL2026' ∧ seats_left > 0"] --> O1["O (offering)"]
+    end
 ```
 
-**What PostgreSQL did**: none: Seq Scan of 4,500 rows, 4,385 removed by the filter. B-tree and
-hash: Bitmap Index Scan on `ix_offering_slot_id`, then Bitmap Heap Scan with the other two
-conditions as a filter. The gain is small in absolute terms because the table fits in a few pages.
+```mermaid
+flowchart TB
+    subgraph optimised["Heuristically optimised tree"]
+        direction TB
+        p2["π offering_id, course_code, faculty_id, capacity, seats_left"] --> s4["σ semester = 'FALL2026'"] --> s3["σ seats_left > 0"] --> s2["σ slot_id = 'T05'"] --> O2["O (offering)"]
+    end
+```
+
+**What PostgreSQL did.**
+- *none*: a Seq Scan tests all three conditions on every row, as in the canonical tree: 4,385 of
+  the 4,500 rows removed, 83 pages read.
+- *btree* and *hash*: the optimised order. A Bitmap Index Scan on `ix_offering_slot_id` applies
+  `slot_id = 'T05'` first and finds the 159 offerings; the Bitmap Heap Scan then applies the other
+  two conditions as one filter (44 removed, 115 left), reading 37–38 pages.
+
+The gain is small in absolute terms (0.37 → 0.12 ms) because the whole table is only 83 pages.
 
 ## Q3. Registrations for a course within a time range
 
@@ -174,6 +208,7 @@ ORDER BY r.registered_at;
 ```mermaid
 flowchart TB
     subgraph canonical["Canonical tree"]
+        direction TB
         p1["π reg_no, registered_at, offering_id, slot_id"] --> s1["σ O.course_code = 'BCHY104P' ∧ t1 ≤ R.registered_at ≤ t2<br/>∧ R.offering_id = O.offering_id"] --> x["×"]
         x --> R1["R"]
         x --> O1["O"]
@@ -183,6 +218,7 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph optimised["Heuristically optimised tree"]
+        direction TB
         p2["π reg_no, registered_at, offering_id, slot_id"] --> j["⋈ R.offering_id = O.offering_id"]
         j --> pr["π reg_no, registered_at, offering_id"] --> sr["σ t1 ≤ registered_at ≤ t2"] --> R2["R"]
         j --> po["π offering_id, slot_id"] --> so["σ course_code = 'BCHY104P'"] --> O2["O"]
@@ -214,28 +250,63 @@ GROUP BY s.reg_no, s.first_name, s.last_name
 HAVING COALESCE(SUM(c.credits), 0) < 16;
 ```
 
-**Relational algebra**
+**Relational algebra (canonical)**
 
-σ<sub>credits < 16</sub> γ<sub>reg_no, first_name, last_name; COALESCE(SUM(credits),0)→credits</sub>
+π<sub>reg_no, first_name, last_name, credits</sub> σ<sub>credits < 16</sub>
+γ<sub>reg_no, first_name, last_name; COALESCE(SUM(credits),0)→credits</sub>
 ( ( (S ⟕<sub>S.reg_no=R.reg_no</sub> R) ⟕<sub>R.offering_id=O.offering_id ∧ O.semester='FALL2026'</sub> O )
 ⟕<sub>O.course_code=C.course_code</sub> C )
 
-The selection after γ is the HAVING clause. The heuristics barely apply: there is no selective
-condition to push down. The one legal push-down is the semester test, which belongs to the
+The σ after γ is the HAVING clause. The usual canonical recipe (× of the FROM list, then one σ)
+does not work for outer joins: a σ over a × is an inner join, which would drop every student with
+no matching row, and those are exactly the students with 0 credits. So the canonical tree keeps
+the three ⟕ as written, each with its whole ON condition, nothing pushed down, and the π for the
+SELECT list on top.
+
+**Optimised.** The heuristics barely apply: there is no selective condition to push down, so no
+smaller input to join first. The one legal push-down is the semester test, which belongs to the
 null-supplying side O of an outer join, so it may be applied to O before joining
 (σ<sub>semester='FALL2026'</sub>(O)). It may NOT be moved above the outer join into a WHERE: that
 would throw away students with no registrations, who are exactly the ones with 0 credits.
+Projections go down to the four tables, and the top π disappears: γ already outputs exactly the
+SELECT list, so it would keep every column.
+
+σ<sub>credits < 16</sub> γ<sub>…</sub>
+( ( ( π<sub>reg_no, first_name, last_name</sub>(S) ⟕<sub>reg_no</sub> π<sub>reg_no, offering_id</sub>(R) )
+⟕<sub>offering_id</sub> π<sub>offering_id, course_code</sub>(σ<sub>semester='FALL2026'</sub>(O)) )
+⟕<sub>course_code</sub> π<sub>course_code, credits</sub>(C) )
 
 ```mermaid
 flowchart TB
-    h["σ credits < 16  (HAVING)"] --> g["γ reg_no, first_name, last_name; COALESCE(SUM(credits), 0)"]
-    g --> j3["⟕ O.course_code = C.course_code"]
-    j3 --> j2["⟕ R.offering_id = O.offering_id"]
-    j3 --> pc["π course_code, credits"] --> C["C"]
-    j2 --> j1["⟕ S.reg_no = R.reg_no"]
-    j2 --> po["π offering_id, course_code"] --> so["σ semester = 'FALL2026'"] --> O["O"]
-    j1 --> ps["π reg_no, first_name, last_name"] --> S["S"]
-    j1 --> pr["π reg_no, offering_id"] --> R["R"]
+    subgraph canonical["Canonical tree"]
+        direction TB
+        %% Left (preserved) inputs first, deepest join first, as in the optimised tree below.
+        p1["π reg_no, first_name, last_name, credits"] --> h1["σ credits < 16  (HAVING)"] --> g1["γ reg_no, first_name, last_name; COALESCE(SUM(credits), 0)"]
+        g1 --> j3["⟕ O.course_code = C.course_code"]
+        j3 --> j2["⟕ R.offering_id = O.offering_id<br/>∧ O.semester = 'FALL2026'"]
+        j2 --> j1["⟕ S.reg_no = R.reg_no"]
+        j1 --> S1["S (student)"]
+        j1 --> R1["R (registration)"]
+        j2 --> O1["O (offering)"]
+        j3 --> C1["C (course)"]
+    end
+```
+
+```mermaid
+flowchart TB
+    subgraph optimised["Heuristically optimised tree"]
+        direction TB
+        %% Outer joins are not symmetric: each join's left (preserved) input is declared
+        %% first, deepest join first, so Mermaid draws it on the left.
+        h2["σ credits < 16  (HAVING)"] --> g2["γ reg_no, first_name, last_name; COALESCE(SUM(credits), 0)"]
+        g2 --> k3["⟕ O.course_code = C.course_code"]
+        k3 --> k2["⟕ R.offering_id = O.offering_id"]
+        k2 --> k1["⟕ S.reg_no = R.reg_no"]
+        k1 --> ps["π reg_no, first_name, last_name"] --> S2["S"]
+        k1 --> pr["π reg_no, offering_id"] --> R2["R"]
+        k2 --> po["π offering_id, course_code"] --> so["σ semester = 'FALL2026'"] --> O2["O"]
+        k3 --> pc["π course_code, credits"] --> C2["C"]
+    end
 ```
 
 **What PostgreSQL did** (all setups the same): Seq Scans of all four tables, a Hash Right Join
@@ -273,6 +344,7 @@ is pushed to O as well. Join the two tiny inputs first, then grow outward:
 ```mermaid
 flowchart TB
     subgraph canonical["Canonical tree"]
+        direction TB
         p1["π faculty, offering_id, course_code, slot_id, reg_no, first_name, last_name"] --> s1["σ all six conditions"] --> x4["×"]
         x4 --> x3["×"]
         x4 --> S1["S"]
@@ -288,6 +360,7 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph optimised["Heuristically optimised tree"]
+        direction TB
         p2["π faculty, offering_id, course_code, slot_id, reg_no, first_name, last_name"] --> j4["⋈ R.reg_no = S.reg_no"]
         j4 --> j3["⋈ O.offering_id = R.offering_id"]
         j4 --> ps["π reg_no, first_name, last_name"] --> S2["S"]
