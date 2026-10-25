@@ -3,18 +3,13 @@
 Each check is one SQL query that counts violations; 0 means PASS. Offerings in
 the DEMO semester are reported separately: the lost-update demo breaks the
 seat count there on purpose.
-Results go to results/check_data.txt, results/data_profile.png and the
-chart's numbers to results/data_profile.json.
+Results go to results/check_data.txt and results/data_profile.png.
 """
-import json
-from collections import Counter
-
 from . import charts
 from .config import DEMO_SEMESTER, RESULTS_DIR
 from .db import pg_connect
 
 REPORT_FILE = RESULTS_DIR / "check_data.txt"
-PROFILE_FILE = RESULTS_DIR / "data_profile.json"
 
 # (description, query returning the number of violations). %(demo)s = 'DEMO'.
 CHECKS = [
@@ -118,16 +113,6 @@ def profile(conn, report: list[str]) -> None:
         report.append(f"Credits per student: mean {sum(credits) / len(credits):.1f}, "
                       f"min {min(credits)}, max {max(credits)}; "
                       f"{below:,} students below the minimum of {min_c}")
-
-    # The two histograms as numbers, so the web page can draw them too.
-    # Fill is binned in 5% steps; a full offering (100%) counts in the last bin.
-    fill_bins = Counter(min(int(f // 5) * 5, 95) for f in fills)
-    profile_json = {
-        "min_credits": min_c, "max_credits": max_c,
-        "students_by_credits": {c: n for c, n in sorted(Counter(credits).items())},
-        "offerings_by_fill_pct": {b: fill_bins.get(b, 0) for b in range(0, 100, 5)},
-    }
-    PROFILE_FILE.write_text(json.dumps(profile_json, indent=2), encoding="utf-8")
 
     fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
     # Bin edges at x.5 so each bar is centred on a whole number of credits.

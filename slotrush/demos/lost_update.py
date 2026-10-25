@@ -50,9 +50,6 @@ def run() -> int:
     # Chart: (a) admitted vs capacity, (b) the value each admitted bot read, in commit order.
     ok = sorted((commit_times[i], r[1]) for i, r in enumerate(results)
                 if isinstance(r, tuple) and r[0] == "OK")
-    common.write_csv("demo_lost_update_reads.csv",
-                     ["commit_order", "seats_left_read", "should_have_read"],
-                     [(n, seats, max(capacity - n + 1, 0)) for n, (_, seats) in enumerate(ok, 1)])
     fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
     bars = left.bar(["capacity", "admitted", "seats_left\nat the end"],
                     [capacity, admitted, seats_left], width=0.5,

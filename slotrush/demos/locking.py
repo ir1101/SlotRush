@@ -110,13 +110,11 @@ def run() -> int:
 
     common.save_run("locking", capacity=capacity, bots=BOTS, admitted=admitted,
                     seats_left=seats_left, seconds=round(seconds, 3), retries=0,
-                    max_waiting=waiting_sessions, full=statuses["FULL"])
+                    max_waiting=waiting_sessions)
 
+    fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
     times = [t for t, _ in samples]
     waiting = [len({row[0] for row in rows}) for _, rows in samples]
-    common.write_csv("demo_locking_queue.csv", ["seconds", "waiting_sessions"],
-                     [(f"{t:.3f}", n) for t, n in zip(times, waiting)])
-    fig, (left, right) = charts.figure(ncols=2, width=11, height=4)
     left.plot(times, waiting, color=charts.PRIMARY)
     left.set_title("Sessions waiting for a lock (pg_locks)")
     left.set_xlabel("seconds since the monitor started")

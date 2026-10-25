@@ -42,10 +42,6 @@ go into a virtual environment.
    ```
    python -m slotrush review
    ```
-8. Open the web front end at http://127.0.0.1:5000 (Ctrl+C stops it):
-   ```
-   python -m slotrush web
-   ```
 
 To open a SQL prompt: `docker exec -it slotrush-postgres psql -U slotrush -d slotrush`.
 To stop: `python -m slotrush down` (data is kept; `down --wipe` deletes it).
@@ -67,7 +63,6 @@ To stop: `python -m slotrush down` (data is kept; `down --wipe` deletes it).
 | `bench` | five queries under no index, B-tree and hash indexes | 4 |
 | `normalise` | flat export, FD checks, 1NF to BCNF, 4NF and 5NF, lossless-join checks | 3 |
 | `reviews` | MongoDB reviews: seed, index explain, aggregations | 7 |
-| `web` | the web front end (Flask): log in as a student, faculty member or admin; every page shows the SQL it ran | 1 Architecture, 2 (views, roles, RLS) |
 | `test` | pytest, report saved to `results/` | all |
 | `review` | runs the demos in order; `--no-pause`, `--start N` | all |
 
@@ -101,32 +96,6 @@ results/             every chart, CSV, plan and log the commands produce
 - **Demo data lives apart**: demo offerings are in semester `DEMO`, bot students are
   `99BOT0001…`. Every demo wipes all demo rows first, so the lost-update demo's broken seat count
   never affects `check-data` or the crash check.
-
-## The web front end
-
-`python -m slotrush web` serves server-rendered pages from Flask (`slotrush/web/`). There are no
-passwords: "Log in as" only chooses a role and a student or faculty member. Each request then
-runs in one transaction that starts with `SET LOCAL ROLE student_role` (or `faculty_role` /
-`admin_role`) and `set_config('app.reg_no', …, true)`, so the same row-level security the tests
-check decides what each page shows. Registering, dropping and swapping call the PL/pgSQL
-functions and show the status code they return. A "Queries" panel at the bottom of every page
-lists the exact SQL it ran and as which role.
-
-- Pages: home (live counts), log in as, student (timetable, credits meter, drop, swap),
-  catalogue (search and register), faculty (class lists), admin (seat fill), evidence
-  (everything in `results/`; the charts are drawn by the page from the numbers each command
-  saves, and link to the PNG versions for the report).
-- The look was designed with the taste-skill process (notes and direction sheet in
-  `.taste-skill/`): olive on bone, Libre Franklin for display and Source Serif 4 for text
-  (Google Fonts; without internet they fall back to system fonts). The home page opens on
-  "30 seats, 80 students" and lets you pick a guard (no lock, row lock, serializable) to see what
-  the concurrency demos measured, with a replay of the 80 bots racing for the 30 seats; it reads
-  the numbers from `results/`. All motion respects the system's reduced-motion setting.
-- Four found photographs (public domain, CC0 and CC BY) are in `slotrush/web/static/img/`, with
-  their sources and licences in `credits.json`; the footer credits each one. They show the world
-  around the project (punched cards, lecture seats, the VIT campus), never SlotRush itself.
-- It is a single-user demo on `127.0.0.1`: the development server, no CSRF tokens, and a new
-  session key on every start (restarting signs everyone out).
 
 ## Troubleshooting
 

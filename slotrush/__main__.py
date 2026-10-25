@@ -26,7 +26,6 @@ COMMANDS = [
     ("bench", "five queries x three index setups, plans and timings"),
     ("normalise", "flat export, FD checks and lossless-join checks (1NF to 5NF)"),
     ("reviews", "seed MongoDB reviews, index explain, aggregations"),
-    ("web", "start the web front end on http://127.0.0.1:5000"),
     ("test", "run pytest and save the report to results/pytest_report.txt"),
     ("review", "run every demo in order, pausing for Enter between them"),
 ]
@@ -56,7 +55,6 @@ def main(argv: list[str] | None = None) -> int:
                               help="build the schema in the test database instead")
     sub["crash"].add_argument("--async-commit", action="store_true",
                               help="bots use synchronous_commit = off (check (a) may FAIL)")
-    sub["web"].add_argument("--port", type=int, default=5000, help="port to listen on")
     sub["review"].add_argument("--no-pause", action="store_true", help="do not wait for Enter")
     sub["review"].add_argument("--start", type=int, default=1, help="start at this step number")
     args = parser.parse_args(argv)
@@ -106,9 +104,6 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "reviews":
         from . import nosql
         return nosql.run()
-    if args.command == "web":
-        from .web import app
-        return app.run(port=args.port)
     if args.command == "test":
         return run_tests()
     if args.command == "review":

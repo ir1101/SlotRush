@@ -1,5 +1,0 @@
-run,student,result,begin_s,dropped_s,asked_s,end_s
-naive,A,committed (OK),0.001,0.018,0.033,1.042
-naive,B,"deadlock victim, rolled back",0.001,0.033,0.033,1.035
-swap,A,committed (OK),0.000,0.038,0.031,0.543
-swap,B,committed (OK),0.000,0.549,0.031,1.052

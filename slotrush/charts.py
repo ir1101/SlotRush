@@ -1,10 +1,10 @@
 """One shared look for every chart saved to results/.
 
-The charts use the web front end's colours, so they sit naturally on its
-evidence page and in the report: olive ink on a bone background. The three
-series colours were checked with a colour-blindness validator against the bone
-background (all pairs pass); they are used in this fixed order. Text is always
-in the ink colour, never in a series colour.
+Olive ink on a bone (off-white) background, so every chart in the report looks
+like part of one set. The three series colours were checked with a
+colour-blindness validator against the bone background (all pairs pass); they
+are used in this fixed order. Text is always in the ink colour, never in a
+series colour.
 """
 import matplotlib
 
@@ -23,7 +23,7 @@ SERIES = [PRIMARY, SECONDARY, TERTIARY]
 GOOD = PRIMARY
 CRITICAL = "#a3361f"
 
-SURFACE = "#ecebe7"      # bone: chart background, the same as the web page
+SURFACE = "#ecebe7"      # bone: chart background
 INK = "#38450f"          # titles and values
 INK_2 = "#5d683a"        # axis labels, legend text
 MUTED = "#6b7350"        # tick labels
@@ -34,7 +34,7 @@ plt.rcParams.update({
     "figure.facecolor": SURFACE,
     "axes.facecolor": SURFACE,
     "savefig.facecolor": SURFACE,
-    # The site's Libre Franklin is a web font; these are close system faces.
+    # Libre Franklin if it is installed, otherwise a close system face.
     "font.family": "sans-serif",
     "font.sans-serif": ["Libre Franklin", "Segoe UI", "Helvetica Neue", "Arial", "DejaVu Sans"],
     "font.size": 10,

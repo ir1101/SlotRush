@@ -8,7 +8,6 @@ Demo data is kept apart from the real data:
 Every demo calls reset() first, which deletes ALL demo rows, so any demo can
 be rerun any number of times and leftovers from one demo never break another.
 """
-import csv
 import json
 import threading
 import time
@@ -139,12 +138,4 @@ def load_run(name: str) -> dict | None:
 def write_text(name: str, text: str) -> str:
     RESULTS_DIR.mkdir(exist_ok=True)
     (RESULTS_DIR / name).write_text(text, encoding="utf-8")
-    return f"results/{name}"
-
-
-def write_csv(name: str, header: list[str], rows) -> str:
-    """Save the numbers behind a chart, so the web page can draw the same chart."""
-    RESULTS_DIR.mkdir(exist_ok=True)
-    with (RESULTS_DIR / name).open("w", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerows([header, *rows])
     return f"results/{name}"

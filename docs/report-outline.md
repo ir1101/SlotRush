@@ -16,10 +16,6 @@ Every file below is produced by a command (shown in brackets) and can be regener
   query or view.
 - Evidence: `results/phase0_connection_check.txt` (`check`): versions, `fsync`, `synchronous_commit`,
   `wal_level`, `max_connections`.
-- Three-tier architecture in the web front end (`python -m slotrush web`): browser → Flask app
-  server (`slotrush/web/`) → PostgreSQL. The app server holds a `psycopg_pool` connection pool,
-  is the trusted layer that sets `app.reg_no`, and each page's "Queries" panel shows the SQL it
-  sent and the role it ran as. Tested in `tests/test_web.py`.
 
 ## 2. Relational model and ER
 

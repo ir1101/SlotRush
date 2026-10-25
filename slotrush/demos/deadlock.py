@@ -145,13 +145,6 @@ def run() -> int:
     path = common.write_text("demo_deadlock_server_log.txt", "\n".join(log) + "\n")
     print(f"\nServer log lines saved to {path} ({len(log)} lines)")
 
-    # The moments each student began, finished its drop (or got its locks), asked
-    # for the second offering and ended: the numbers behind the timeline chart.
-    common.write_csv("demo_deadlock_timeline.csv",
-                     ["run", "student", "result", "begin_s", "dropped_s", "asked_s", "end_s"],
-                     [(run, name, outcome[name][0],
-                       *(f"{outcome[name][1][k]:.3f}" for k in ("begin", "dropped", "asked", "end")))
-                      for run, outcome in (("naive", naive), ("swap", swaps)) for name in "AB"])
     timeline_chart(naive, swaps)
     both_swapped = all(s[0].startswith("committed (OK") for s in swaps.values())
     return 0 if len(victims) == 1 and both_swapped else 1
