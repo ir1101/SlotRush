@@ -1,12 +1,12 @@
 -- COUNT(*) counts rows; COUNT(column) skips NULLs
 SELECT count(*) AS all_offerings, count(venue) AS with_venue, count(*) - count(venue) AS venue_null FROM offering;
    all_offerings | with_venue | venue_null
-   4520 | 4312 | 208
+   4500 | 4312 | 188
 
 -- '= NULL' is never true (it is UNKNOWN); use IS NULL
 SELECT (SELECT count(*) FROM offering WHERE venue = NULL) AS equals_null, (SELECT count(*) FROM offering WHERE venue IS NULL) AS is_null;
    equals_null | is_null
-   0 | 208
+   0 | 188
 
 -- Comparisons with NULL give NULL (unknown), even NULL = NULL
 SELECT NULL = NULL AS null_eq_null, NULL <> 'SJT101' AS null_ne_text, NULL IS NULL AS null_is_null;
@@ -40,7 +40,7 @@ SELECT semester, slot_id, count(*) AS classes_with_null_venue FROM offering WHER
 -- GROUP BY puts every NULL venue into ONE group, although NULL = NULL is not true
 SELECT venue, count(*) AS classes FROM offering WHERE slot_id = 'T05' GROUP BY venue ORDER BY count(*) DESC, venue LIMIT 3;
    venue | classes
-   NULL | 7
+   NULL | 6
    MB101 | 1
    MB102 | 1
 

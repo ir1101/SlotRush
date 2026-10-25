@@ -5,20 +5,20 @@ SELECT o.offering_id, o.course_code, o.faculty_id, o.capacity, o.seats_left
             WHERE o.slot_id = %(slot_id)s AND o.semester = %(semester)s AND o.seats_left > 0
             ORDER BY o.seats_left DESC
 
-Sort  (cost=95.25..95.51 rows=104 width=21) (actual time=0.136..0.142 rows=115 loops=1)
+Sort  (cost=95.25..95.51 rows=104 width=21) (actual time=0.120..0.125 rows=115 loops=1)
   Sort Key: seats_left DESC
   Sort Method: quicksort  Memory: 29kB
   Buffers: shared hit=35 read=2
-  ->  Bitmap Heap Scan on offering o  (cost=5.50..91.77 rows=104 width=21) (actual time=0.042..0.109 rows=115 loops=1)
+  ->  Bitmap Heap Scan on offering o  (cost=5.50..91.77 rows=104 width=21) (actual time=0.029..0.093 rows=115 loops=1)
         Recheck Cond: ((slot_id)::text = 'T05'::text)
         Filter: ((seats_left > 0) AND ((semester)::text = 'FALL2026'::text))
         Rows Removed by Filter: 44
         Heap Blocks: exact=35
         Buffers: shared hit=35 read=2
-        ->  Bitmap Index Scan on ix_offering_slot_id  (cost=0.00..5.47 rows=159 width=0) (actual time=0.033..0.033 rows=159 loops=1)
+        ->  Bitmap Index Scan on ix_offering_slot_id  (cost=0.00..5.47 rows=159 width=0) (actual time=0.021..0.021 rows=159 loops=1)
               Index Cond: ((slot_id)::text = 'T05'::text)
               Buffers: shared read=2
 Planning:
-  Buffers: shared hit=12
-Planning Time: 0.119 ms
-Execution Time: 0.158 ms
+  Buffers: shared hit=14
+Planning Time: 0.117 ms
+Execution Time: 0.141 ms

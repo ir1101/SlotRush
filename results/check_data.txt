@@ -12,22 +12,22 @@ SlotRush data check
 DEMO semester: 0 offering(s) with seat counts out of line (expected after the lost-update demo; real data is unaffected).
 
 Row counts
-  student               31,000
+  student               30,000
   student_phone         40,466
-  faculty                  751
-  course                   601
-  theory_course            361
+  faculty                  750
+  course                   600
+  theory_course            360
   lab_course               180
   project_course            60
   prerequisite             240
   completed_course     450,954
   slot                      36
   slot_timing               80
-  offering               4,520
-  registration         258,826
+  offering               4,500
+  registration         258,514
   waitlist                   0
 
-Seats 315,596, taken 258,514 (81.9% full); 1,547 offerings full; 208 venues not yet allotted (NULL)
+Seats 315,596, taken 258,514 (81.9% full); 1,547 offerings full; 188 venues not yet allotted (NULL)
 Credits per student: mean 19.4, min 12, max 27; 7,693 students below the minimum of 16
 Chart: results/data_profile.png
 

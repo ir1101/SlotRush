@@ -1,10 +1,10 @@
 {
   "run": "crash",
-  "logged": 358,
-  "found": 358,
+  "logged": 360,
+  "found": 361,
   "missing": 0,
-  "unlogged": 0,
+  "unlogged": 1,
   "check_a": true,
   "check_b": true,
-  "seconds": 0.585
+  "seconds": 0.655
 }

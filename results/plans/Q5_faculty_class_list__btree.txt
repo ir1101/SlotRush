@@ -10,22 +10,22 @@ SELECT f.last_name AS faculty, o.offering_id, c.course_code, o.slot_id,
             WHERE f.faculty_id = %(faculty_id)s AND o.semester = %(semester)s
             ORDER BY o.offering_id, s.last_name
 
-Sort  (cost=239.80..240.67 rows=345 width=45) (actual time=3.134..3.159 rows=558 loops=1)
+Sort  (cost=227.60..228.46 rows=345 width=45) (actual time=3.353..3.375 rows=558 loops=1)
   Sort Key: o.offering_id, s.last_name
   Sort Method: quicksort  Memory: 64kB
   Buffers: shared hit=1728 read=2
-  ->  Nested Loop  (cost=1.54..225.26 rows=345 width=45) (actual time=0.107..2.529 rows=558 loops=1)
+  ->  Nested Loop  (cost=1.54..213.05 rows=345 width=45) (actual time=0.106..2.719 rows=558 loops=1)
         Buffers: shared hit=1728 read=2
-        ->  Nested Loop  (cost=1.25..116.76 rows=345 width=33) (actual time=0.100..0.299 rows=558 loops=1)
+        ->  Nested Loop  (cost=1.25..104.76 rows=345 width=33) (actual time=0.099..0.333 rows=558 loops=1)
               Buffers: shared hit=54 read=2
-              ->  Nested Loop  (cost=0.83..36.50 rows=6 width=23) (actual time=0.092..0.123 rows=8 loops=1)
+              ->  Nested Loop  (cost=0.83..36.50 rows=6 width=23) (actual time=0.069..0.138 rows=8 loops=1)
                     Buffers: shared hit=29 read=2
-                    ->  Nested Loop  (cost=0.56..18.74 rows=6 width=23) (actual time=0.085..0.096 rows=8 loops=1)
+                    ->  Nested Loop  (cost=0.56..18.74 rows=6 width=23) (actual time=0.062..0.073 rows=8 loops=1)
                           Buffers: shared hit=11 read=2
-                          ->  Index Scan using faculty_pkey on faculty f  (cost=0.28..8.29 rows=1 width=10) (actual time=0.007..0.008 rows=1 loops=1)
+                          ->  Index Scan using faculty_pkey on faculty f  (cost=0.28..8.29 rows=1 width=10) (actual time=0.007..0.009 rows=1 loops=1)
                                 Index Cond: (faculty_id = '1631'::smallint)
                                 Buffers: shared hit=3
-                          ->  Index Scan using ix_offering_faculty_id on offering o  (cost=0.28..10.39 rows=6 width=21) (actual time=0.077..0.085 rows=8 loops=1)
+                          ->  Index Scan using ix_offering_faculty_id on offering o  (cost=0.28..10.39 rows=6 width=21) (actual time=0.053..0.061 rows=8 loops=1)
                                 Index Cond: (faculty_id = '1631'::smallint)
                                 Filter: ((semester)::text = 'FALL2026'::text)
                                 Buffers: shared hit=8 read=2
@@ -33,7 +33,7 @@ Sort  (cost=239.80..240.67 rows=345 width=45) (actual time=3.134..3.159 rows=558
                           Index Cond: (course_code = (o.course_code)::text)
                           Heap Fetches: 1
                           Buffers: shared hit=18
-              ->  Index Only Scan using registration_pkey on registration r  (cost=0.42..12.79 rows=59 width=14) (actual time=0.008..0.015 rows=70 loops=8)
+              ->  Index Only Scan using registration_pkey on registration r  (cost=0.42..10.79 rows=59 width=14) (actual time=0.009..0.017 rows=70 loops=8)
                     Index Cond: (offering_id = o.offering_id)
                     Heap Fetches: 0
                     Buffers: shared hit=25
@@ -41,6 +41,6 @@ Sort  (cost=239.80..240.67 rows=345 width=45) (actual time=3.134..3.159 rows=558
               Index Cond: ((reg_no)::text = (r.reg_no)::text)
               Buffers: shared hit=1674
 Planning:
-  Buffers: shared hit=56
-Planning Time: 0.581 ms
-Execution Time: 3.201 ms
+  Buffers: shared hit=42
+Planning Time: 0.608 ms
+Execution Time: 3.419 ms

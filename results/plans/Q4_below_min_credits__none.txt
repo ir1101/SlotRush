@@ -9,40 +9,40 @@ SELECT s.reg_no, s.first_name, s.last_name, COALESCE(SUM(c.credits), 0) AS credi
             GROUP BY s.reg_no, s.first_name, s.last_name
             HAVING COALESCE(SUM(c.credits), 0) < %(min_credits)s
 
-HashAggregate  (cost=8984.91..9393.74 rows=10902 width=30) (actual time=219.539..225.743 rows=7693 loops=1)
+HashAggregate  (cost=8881.41..9259.40 rows=10080 width=30) (actual time=251.134..254.875 rows=7693 loops=1)
   Group Key: s.reg_no
   Filter: (COALESCE(sum(c.credits), '0'::bigint) < '16'::smallint)
   Batches: 1  Memory Usage: 4369kB
   Rows Removed by Filter: 22307
-  Buffers: shared hit=2204
-  ->  Hash Left Join  (cost=1361.88..7692.34 rows=258514 width=24) (actual time=9.265..174.162 rows=258514 loops=1)
+  Buffers: shared hit=2156
+  ->  Hash Left Join  (cost=1275.38..7588.84 rows=258514 width=24) (actual time=11.083..197.426 rows=258514 loops=1)
         Hash Cond: ((o.course_code)::text = (c.course_code)::text)
-        Buffers: shared hit=2204
-        ->  Hash Left Join  (cost=1342.38..6989.45 rows=258514 width=31) (actual time=9.072..125.931 rows=258514 loops=1)
+        Buffers: shared hit=2156
+        ->  Hash Left Join  (cost=1255.88..6885.95 rows=258514 width=31) (actual time=10.892..143.864 rows=258514 loops=1)
               Hash Cond: (r.offering_id = o.offering_id)
-              Buffers: shared hit=2198
-              ->  Hash Right Join  (cost=1146.88..6114.71 rows=258514 width=26) (actual time=7.820..82.303 rows=258514 loops=1)
+              Buffers: shared hit=2150
+              ->  Hash Right Join  (cost=1060.38..6011.22 rows=258514 width=26) (actual time=9.488..94.464 rows=258514 loops=1)
                     Hash Cond: ((r.reg_no)::text = (s.reg_no)::text)
-                    Buffers: shared hit=2115
-                    ->  Seq Scan on registration r  (cost=0.00..4289.14 rows=258514 width=14) (actual time=0.006..15.960 rows=258514 loops=1)
-                          Buffers: shared hit=1704
-                    ->  Hash  (cost=738.06..738.06 rows=32706 width=22) (actual time=7.800..7.801 rows=30000 loops=1)
+                    Buffers: shared hit=2067
+                    ->  Seq Scan on registration r  (cost=0.00..4272.14 rows=258514 width=14) (actual time=0.008..18.342 rows=258514 loops=1)
+                          Buffers: shared hit=1687
+                    ->  Hash  (cost=682.39..682.39 rows=30239 width=22) (actual time=9.459..9.460 rows=30000 loops=1)
                           Buckets: 32768  Batches: 1  Memory Usage: 1882kB
-                          Buffers: shared hit=411
-                          ->  Seq Scan on student s  (cost=0.00..738.06 rows=32706 width=22) (actual time=0.006..2.902 rows=30000 loops=1)
-                                Buffers: shared hit=411
-              ->  Hash  (cost=139.25..139.25 rows=4500 width=13) (actual time=1.223..1.224 rows=4500 loops=1)
+                          Buffers: shared hit=380
+                          ->  Seq Scan on student s  (cost=0.00..682.39 rows=30239 width=22) (actual time=0.007..3.439 rows=30000 loops=1)
+                                Buffers: shared hit=380
+              ->  Hash  (cost=139.25..139.25 rows=4500 width=13) (actual time=1.369..1.370 rows=4500 loops=1)
                     Buckets: 8192  Batches: 1  Memory Usage: 262kB
                     Buffers: shared hit=83
-                    ->  Seq Scan on offering o  (cost=0.00..139.25 rows=4500 width=13) (actual time=0.009..0.578 rows=4500 loops=1)
+                    ->  Seq Scan on offering o  (cost=0.00..139.25 rows=4500 width=13) (actual time=0.008..0.644 rows=4500 loops=1)
                           Filter: ((semester)::text = 'FALL2026'::text)
                           Buffers: shared hit=83
-        ->  Hash  (cost=12.00..12.00 rows=600 width=11) (actual time=0.181..0.182 rows=600 loops=1)
+        ->  Hash  (cost=12.00..12.00 rows=600 width=11) (actual time=0.177..0.178 rows=600 loops=1)
               Buckets: 1024  Batches: 1  Memory Usage: 34kB
               Buffers: shared hit=6
-              ->  Seq Scan on course c  (cost=0.00..12.00 rows=600 width=11) (actual time=0.005..0.053 rows=600 loops=1)
+              ->  Seq Scan on course c  (cost=0.00..12.00 rows=600 width=11) (actual time=0.004..0.067 rows=600 loops=1)
                     Buffers: shared hit=6
 Planning:
-  Buffers: shared hit=166 read=1 dirtied=2
-Planning Time: 1.209 ms
-Execution Time: 226.225 ms
+  Buffers: shared hit=149
+Planning Time: 0.652 ms
+Execution Time: 255.262 ms

@@ -4,8 +4,8 @@
   "bots": 80,
   "admitted": 30,
   "seats_left": 0,
-  "seconds": 1.843,
-  "retries": 1375,
+  "seconds": 1.877,
+  "retries": 1377,
   "max_retries_one_bot": 23,
   "gave_up": 0
 }

@@ -10,41 +10,41 @@ SELECT f.last_name AS faculty, o.offering_id, c.course_code, o.slot_id,
             WHERE f.faculty_id = %(faculty_id)s AND o.semester = %(semester)s
             ORDER BY o.offering_id, s.last_name
 
-Sort  (cost=252.71..253.57 rows=345 width=45) (actual time=2.625..2.643 rows=558 loops=1)
+Sort  (cost=240.50..241.37 rows=345 width=45) (actual time=3.491..3.516 rows=558 loops=1)
   Sort Key: o.offering_id, s.last_name
   Sort Method: quicksort  Memory: 64kB
   Buffers: shared hit=1730
-  ->  Nested Loop  (cost=5.30..238.17 rows=345 width=45) (actual time=0.035..2.161 rows=558 loops=1)
+  ->  Nested Loop  (cost=5.30..225.96 rows=345 width=45) (actual time=0.046..2.851 rows=558 loops=1)
         Buffers: shared hit=1730
-        ->  Nested Loop  (cost=5.02..129.66 rows=345 width=33) (actual time=0.029..0.168 rows=558 loops=1)
+        ->  Nested Loop  (cost=5.02..117.67 rows=345 width=33) (actual time=0.038..0.233 rows=558 loops=1)
               Buffers: shared hit=56
-              ->  Nested Loop  (cost=4.60..49.41 rows=6 width=23) (actual time=0.022..0.049 rows=8 loops=1)
+              ->  Nested Loop  (cost=4.60..49.41 rows=6 width=23) (actual time=0.031..0.074 rows=8 loops=1)
                     Buffers: shared hit=31
-                    ->  Nested Loop  (cost=4.32..31.65 rows=6 width=23) (actual time=0.018..0.028 rows=8 loops=1)
+                    ->  Nested Loop  (cost=4.32..31.65 rows=6 width=23) (actual time=0.025..0.043 rows=8 loops=1)
                           Buffers: shared hit=13
-                          ->  Index Scan using faculty_pkey on faculty f  (cost=0.28..8.29 rows=1 width=10) (actual time=0.006..0.006 rows=1 loops=1)
+                          ->  Index Scan using faculty_pkey on faculty f  (cost=0.28..8.29 rows=1 width=10) (actual time=0.007..0.009 rows=1 loops=1)
                                 Index Cond: (faculty_id = '1631'::smallint)
                                 Buffers: shared hit=3
-                          ->  Bitmap Heap Scan on offering o  (cost=4.05..23.30 rows=6 width=21) (actual time=0.011..0.020 rows=8 loops=1)
+                          ->  Bitmap Heap Scan on offering o  (cost=4.05..23.30 rows=6 width=21) (actual time=0.016..0.031 rows=8 loops=1)
                                 Recheck Cond: (faculty_id = '1631'::smallint)
                                 Filter: ((semester)::text = 'FALL2026'::text)
                                 Heap Blocks: exact=8
                                 Buffers: shared hit=10
-                                ->  Bitmap Index Scan on ix_offering_faculty_id  (cost=0.00..4.04 rows=6 width=0) (actual time=0.006..0.006 rows=8 loops=1)
+                                ->  Bitmap Index Scan on ix_offering_faculty_id  (cost=0.00..4.04 rows=6 width=0) (actual time=0.008..0.008 rows=8 loops=1)
                                       Index Cond: (faculty_id = '1631'::smallint)
                                       Buffers: shared hit=2
-                    ->  Index Only Scan using course_course_code_course_type_key on course c  (cost=0.28..2.96 rows=1 width=9) (actual time=0.002..0.002 rows=1 loops=8)
+                    ->  Index Only Scan using course_course_code_course_type_key on course c  (cost=0.28..2.96 rows=1 width=9) (actual time=0.003..0.003 rows=1 loops=8)
                           Index Cond: (course_code = (o.course_code)::text)
                           Heap Fetches: 1
                           Buffers: shared hit=18
-              ->  Index Only Scan using registration_pkey on registration r  (cost=0.42..12.79 rows=59 width=14) (actual time=0.005..0.009 rows=70 loops=8)
+              ->  Index Only Scan using registration_pkey on registration r  (cost=0.42..10.79 rows=59 width=14) (actual time=0.006..0.013 rows=70 loops=8)
                     Index Cond: (offering_id = o.offering_id)
                     Heap Fetches: 0
                     Buffers: shared hit=25
-        ->  Index Scan using student_pkey on student s  (cost=0.29..0.31 rows=1 width=22) (actual time=0.003..0.003 rows=1 loops=558)
+        ->  Index Scan using student_pkey on student s  (cost=0.29..0.31 rows=1 width=22) (actual time=0.004..0.004 rows=1 loops=558)
               Index Cond: ((reg_no)::text = (r.reg_no)::text)
               Buffers: shared hit=1674
 Planning:
-  Buffers: shared hit=42
-Planning Time: 0.428 ms
-Execution Time: 2.680 ms
+  Buffers: shared hit=28
+Planning Time: 0.544 ms
+Execution Time: 3.567 ms

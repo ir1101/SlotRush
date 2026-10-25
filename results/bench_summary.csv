@@ -1,16 +1,16 @@
 query,setup,median_ms,access_paths
-Q1_student_timetable,none,12.366,Seq Scan on registration; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
-Q2_seats_in_slot,none,0.372,Seq Scan on offering
-Q3_course_time_range,none,9.956,Seq Scan on registration; Seq Scan on offering
-Q4_below_min_credits,none,157.083,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
-Q5_faculty_class_list,none,2.557,Index Scan on faculty using faculty_pkey; Seq Scan on offering; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey
-Q1_student_timetable,btree,0.194,Bitmap Heap Scan on registration; Bitmap Index Scan using ix_registration_reg_no; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
-Q2_seats_in_slot,btree,0.121,Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_slot_id
-Q3_course_time_range,btree,0.832,Index Scan on registration using ix_registration_registered_at; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_course_code
-Q4_below_min_credits,btree,176.278,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
-Q5_faculty_class_list,btree,2.655,Index Scan on faculty using faculty_pkey; Index Scan on offering using ix_offering_faculty_id; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey
-Q1_student_timetable,hash,0.168,Bitmap Heap Scan on registration; Bitmap Index Scan using ix_registration_reg_no; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
-Q2_seats_in_slot,hash,0.083,Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_slot_id
-Q3_course_time_range,hash,10.018,Seq Scan on registration; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_course_code
-Q4_below_min_credits,hash,151.853,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
-Q5_faculty_class_list,hash,2.292,Index Scan on faculty using faculty_pkey; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_faculty_id; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey
+Q1_student_timetable,none,13.580,Seq Scan on registration; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
+Q2_seats_in_slot,none,0.497,Seq Scan on offering
+Q3_course_time_range,none,11.577,Seq Scan on registration; Seq Scan on offering
+Q4_below_min_credits,none,199.357,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
+Q5_faculty_class_list,none,3.640,Index Scan on faculty using faculty_pkey; Seq Scan on offering; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey
+Q1_student_timetable,btree,0.179,Bitmap Heap Scan on registration; Bitmap Index Scan using ix_registration_reg_no; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
+Q2_seats_in_slot,btree,0.110,Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_slot_id
+Q3_course_time_range,btree,0.827,Index Scan on registration using ix_registration_registered_at; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_course_code
+Q4_below_min_credits,btree,188.937,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
+Q5_faculty_class_list,btree,2.898,Index Scan on faculty using faculty_pkey; Index Scan on offering using ix_offering_faculty_id; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey
+Q1_student_timetable,hash,0.214,Bitmap Heap Scan on registration; Bitmap Index Scan using ix_registration_reg_no; Index Scan on offering using offering_pkey; Index Scan on course using course_course_code_course_type_key; Index Only Scan on slot_timing using slot_timing_pkey
+Q2_seats_in_slot,hash,0.125,Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_slot_id
+Q3_course_time_range,hash,11.479,Seq Scan on registration; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_course_code
+Q4_below_min_credits,hash,183.712,Seq Scan on registration; Seq Scan on student; Seq Scan on offering; Seq Scan on course
+Q5_faculty_class_list,hash,3.207,Index Scan on faculty using faculty_pkey; Bitmap Heap Scan on offering; Bitmap Index Scan using ix_offering_faculty_id; Index Only Scan on course using course_course_code_course_type_key; Index Only Scan on registration using registration_pkey; Index Scan on student using student_pkey

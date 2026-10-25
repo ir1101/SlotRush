@@ -8,36 +8,36 @@ SELECT t.day, t.period, o.slot_id, c.course_code, c.title, o.venue
             WHERE r.reg_no = %(reg_no)s
             ORDER BY t.day, t.period
 
-Gather Merge  (cost=4646.85..4648.23 rows=12 width=49) (actual time=10.166..11.683 rows=40 loops=1)
+Gather Merge  (cost=4629.85..4631.23 rows=12 width=49) (actual time=10.378..11.996 rows=40 loops=1)
   Workers Planned: 1
   Workers Launched: 1
-  Buffers: shared hit=1855
-  ->  Sort  (cost=3646.84..3646.87 rows=12 width=49) (actual time=8.432..8.435 rows=20 loops=2)
+  Buffers: shared hit=1835
+  ->  Sort  (cost=3629.84..3629.87 rows=12 width=49) (actual time=8.611..8.614 rows=20 loops=2)
         Sort Key: t.day, t.period
-        Sort Method: quicksort  Memory: 25kB
-        Buffers: shared hit=1855
-        Worker 0:  Sort Method: quicksort  Memory: 27kB
-        ->  Nested Loop  (cost=0.70..3646.63 rows=12 width=49) (actual time=7.497..8.409 rows=20 loops=2)
-              Buffers: shared hit=1848
-              ->  Nested Loop  (cost=0.56..3645.63 rows=5 width=45) (actual time=7.485..8.372 rows=10 loops=2)
-                    Buffers: shared hit=1826
-                    ->  Nested Loop  (cost=0.28..3644.12 rows=5 width=19) (actual time=7.475..8.335 rows=10 loops=2)
-                          Buffers: shared hit=1765
-                          ->  Parallel Seq Scan on registration r  (cost=0.00..3604.84 rows=5 width=4) (actual time=7.461..8.286 rows=10 loops=2)
+        Sort Method: quicksort  Memory: 27kB
+        Buffers: shared hit=1835
+        Worker 0:  Sort Method: quicksort  Memory: 25kB
+        ->  Nested Loop  (cost=0.70..3629.63 rows=12 width=49) (actual time=7.716..8.576 rows=20 loops=2)
+              Buffers: shared hit=1828
+              ->  Nested Loop  (cost=0.56..3628.63 rows=5 width=45) (actual time=7.702..8.545 rows=10 loops=2)
+                    Buffers: shared hit=1807
+                    ->  Nested Loop  (cost=0.28..3627.12 rows=5 width=19) (actual time=7.697..8.514 rows=10 loops=2)
+                          Buffers: shared hit=1747
+                          ->  Parallel Seq Scan on registration r  (cost=0.00..3587.84 rows=5 width=4) (actual time=7.685..8.480 rows=10 loops=2)
                                 Filter: ((reg_no)::text = '23BEE0595'::text)
                                 Rows Removed by Filter: 129247
-                                Buffers: shared hit=1704
-                          ->  Index Scan using offering_pkey on offering o  (cost=0.28..7.86 rows=1 width=23) (actual time=0.004..0.004 rows=1 loops=20)
+                                Buffers: shared hit=1687
+                          ->  Index Scan using offering_pkey on offering o  (cost=0.28..7.86 rows=1 width=23) (actual time=0.003..0.003 rows=1 loops=20)
                                 Index Cond: (offering_id = r.offering_id)
-                                Buffers: shared hit=61
+                                Buffers: shared hit=60
                     ->  Index Scan using course_course_code_course_type_key on course c  (cost=0.28..0.30 rows=1 width=35) (actual time=0.003..0.003 rows=1 loops=20)
                           Index Cond: ((course_code)::text = (o.course_code)::text)
-                          Buffers: shared hit=61
-              ->  Index Only Scan using slot_timing_pkey on slot_timing t  (cost=0.14..0.18 rows=2 width=8) (actual time=0.003..0.003 rows=2 loops=20)
+                          Buffers: shared hit=60
+              ->  Index Only Scan using slot_timing_pkey on slot_timing t  (cost=0.14..0.18 rows=2 width=8) (actual time=0.002..0.003 rows=2 loops=20)
                     Index Cond: (slot_id = (o.slot_id)::text)
                     Heap Fetches: 0
-                    Buffers: shared hit=22
+                    Buffers: shared hit=21
 Planning:
-  Buffers: shared hit=185
-Planning Time: 0.646 ms
-Execution Time: 11.711 ms
+  Buffers: shared hit=170
+Planning Time: 0.659 ms
+Execution Time: 12.026 ms
